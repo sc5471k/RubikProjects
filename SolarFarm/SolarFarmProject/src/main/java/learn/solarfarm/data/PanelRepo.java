@@ -1,2 +1,4 @@
-package learn.solarfarm.data;public interface PanelRepo {
+package learn.solarfarm.data;
+
+public interface PanelRepo {
 }

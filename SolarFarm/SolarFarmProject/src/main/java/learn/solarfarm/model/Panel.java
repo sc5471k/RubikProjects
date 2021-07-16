@@ -1,2 +1,4 @@
-package PACKAGE_NAME;public class Panel {
+package learn.solarfarm.model;
+
+public class Panel {
 }
