@@ -9,7 +9,7 @@ import learn.solarfarm.domain.PanelService;
 public class App {
     public static void main(String[] args) {
 
-        PanelFileRepo repo = new PanelFileRepo("./data/panels.txt");
+        PanelFileRepo repo = new PanelFileRepo("./data/panels.csv");
         PanelService service = new PanelService(repo);
 
         ConsoleIO io = new ConsoleIO();

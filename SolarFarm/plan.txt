@@ -1,0 +1,66 @@
+Data
+(DataAccessException)
+
+(PanelRepo - interface)
+-findAll
+-findbySection
+-add
+-update
+-delete
+
+(PanelFileRepo)
+-writeToFile
+-findAll
+-findBySection
+-add
+-update
+-delete
+
+Domain
+(PanelResult)
+- get+add error messages
+
+(PanelService)
+-findBySection
+- add
+-update
+-remove
+- validate
+	section required
+	row positive <= 250
+	column positive <= 250
+	year is past
+	material required + in enum
+	isTracking required
+	section+row+column must not be duplicated
+	
+Model
+(Panel)
+String Section
+Int Row
+Int Column
+Date/Time/Int Year Installed
+Enum Material
+Boolean IsTracking
+Int panelID
+
+all have getters and setters
+
+
+UI
+(Controller)
+-run Y
+-run app, switch statement with menu option form view Y
+-view
+-add
+-update
+-delete
+
+(View)
+-menuoption Y
+-choose panel
+-displayPanel
+-createPanel
+-editPanel
+
+(TextIO/ConsoleIO)

@@ -16,8 +16,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class PanelFileRepoTest {
 
-    static final String SEED_FILE_PATH = "./data/panel-seed.txt";
-    static final String TEST_FILE_PATH = "./data/panel-test.txt";
+    static final String SEED_FILE_PATH = "./data/panel-seed.csv";
+    static final String TEST_FILE_PATH = "./data/panel-test.csv";
 
     PanelFileRepo repo = new PanelFileRepo(TEST_FILE_PATH);
 
