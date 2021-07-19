@@ -2,7 +2,7 @@ package learn.solarfarm.UI;
 
 import java.util.Scanner;
 
-public class ConsoleIO implements TextIO{
+public class ConsoleIO implements TextIO {
     private final Scanner console = new Scanner(System.in);
 
     @Override
@@ -37,8 +37,7 @@ public class ConsoleIO implements TextIO{
         while (true) {
             String value = readString(prompt);
             try {
-                int result = Integer.parseInt(value);
-                return result;
+                return Integer.parseInt(value);
             } catch (NumberFormatException ex) {
                 printf("'%s' is not a valid number.%n", value);
             }
