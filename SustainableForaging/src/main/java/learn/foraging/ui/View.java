@@ -4,12 +4,14 @@ import learn.foraging.models.Category;
 import learn.foraging.models.Forage;
 import learn.foraging.models.Forager;
 import learn.foraging.models.Item;
+import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Component
 public class View {
 
     private final ConsoleIO io;
@@ -110,6 +112,14 @@ public class View {
         return forage;
     }
 
+    public Forager makeForager() {
+        Forager forager = new Forager();
+        forager.setFirstName(io.readRequiredString("First Name: "));
+        forager.setLastName(io.readRequiredString("Last Name: "));
+        forager.setState(io.readRequiredString("State: "));
+        return forager;
+    }
+
     public Item makeItem() {
         displayHeader(MainMenuOption.ADD_ITEM.getMessage());
         Item item = new Item();
@@ -179,6 +189,17 @@ public class View {
                     forage.getItem().getName(),
                     forage.getItem().getCategory(),
                     forage.getValue()
+            );
+        }
+    }
+
+    public void displayForagers(List<Forager> foragers) {
+        if (foragers == null || foragers.isEmpty()) {
+            io.println("No foragers found.");
+            return;
+        }
+        for (Forager forager : foragers) {
+            io.printf("%4s %4s %4s%n",  forager.getFirstName(), forager.getLastName(), forager.getState()
             );
         }
     }

@@ -4,11 +4,13 @@ import learn.foraging.data.DataException;
 import learn.foraging.data.ItemRepository;
 import learn.foraging.models.Category;
 import learn.foraging.models.Item;
+import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Service
 public class ItemService {
 
     private final ItemRepository repository;
@@ -24,7 +26,9 @@ public class ItemService {
     }
 
     public Result<Item> add(Item item) throws DataException {
-
+//Category is required.
+// Dollars/Kg must be between $0 (inedible, poisonous) and $7500.
+//Item ID is a system-generated unique sequential integer.
         Result<Item> result = new Result<>();
         if (item == null) {
             result.addErrorMessage("Item must not be null.");
