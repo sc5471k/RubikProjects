@@ -45,7 +45,6 @@ public class ForageService {
     }
 
     public Map<Item, Long> countForageItem(LocalDate date) {
-        //CHANGE to bigdecimal
         return findByDate(date).stream()
                 .collect(Collectors.groupingBy(Forage::getItem,
                         Collectors.counting()));
@@ -123,9 +122,6 @@ public class ForageService {
     }
 
     private Result<Forage> validate(Forage forage) {
-        //The combination of date, Item, and Forager cannot be duplicated.
-        // (Can't forage the same item on the same day. It should be tracked as one Forage.)
-
         Result<Forage> result = validateNulls(forage);
         if (!result.isSuccess()) {
             return result;

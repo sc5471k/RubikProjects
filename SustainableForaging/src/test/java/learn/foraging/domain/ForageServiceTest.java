@@ -12,10 +12,15 @@ import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class ForageServiceTest {
+
+    private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
 
     ForageService service = new ForageService(
             new ForageRepositoryDouble(),
@@ -34,6 +39,25 @@ class ForageServiceTest {
         assertTrue(result.isSuccess());
         assertNotNull(result.getPayload());
         assertEquals(36, result.getPayload().getId().length());
+    }
+
+    @Test
+    void noDuplication() throws DataException {
+        Forage forage = new Forage();
+        forage.setDate(LocalDate.now());
+        forage.setForager(ForagerRepositoryDouble.FORAGER);
+        forage.setItem(ItemRepositoryDouble.ITEM);
+        forage.setKilograms(0.5);
+        Result<Forage> result = service.add(forage);
+
+        Forage forage2 = new Forage();
+        forage2.setDate(LocalDate.now());
+        forage2.setForager(ForagerRepositoryDouble.FORAGER);
+        forage2.setItem(ItemRepositoryDouble.ITEM);
+        forage2.setKilograms(0.5);
+        result = service.add(forage2);
+
+        assertFalse(result.isSuccess());
     }
 
     @Test
@@ -71,4 +95,21 @@ class ForageServiceTest {
     }
 
 
+    @Test
+    void countForageItem() {
+        LocalDate date = LocalDate.parse("01/01/2020", formatter);
+        Map<Item, Long> itemCount = service.countForageItem(date);
+
+        assertNotNull(itemCount);
+    }
+
+    @Test
+    void valCategoriesPerDay() {
+        LocalDate date = LocalDate.parse("01/01/2020", formatter);
+
+        List<Forage> forages = service.findByDate(date);
+        List<BigDecimal> total = service.valCategoriesPerDay(forages);
+
+        assertNotNull(total);
+    }
 }
