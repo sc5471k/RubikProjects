@@ -4,16 +4,15 @@ import learn.foraging.data.DataException;
 import learn.foraging.data.ForageRepository;
 import learn.foraging.data.ForagerRepository;
 import learn.foraging.data.ItemRepository;
+import learn.foraging.models.Category;
 import learn.foraging.models.Forage;
 import learn.foraging.models.Forager;
 import learn.foraging.models.Item;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,9 +31,9 @@ public class ForageService {
     public List<Forage> findByDate(LocalDate date) {
 
         Map<String, Forager> foragerMap = foragerRepository.findAll().stream()
-                .collect(Collectors.toMap(i -> i.getId(), i -> i));
+                .collect(Collectors.toMap(Forager::getId, i -> i));
         Map<Integer, Item> itemMap = itemRepository.findAll().stream()
-                .collect(Collectors.toMap(i -> i.getId(), i -> i));
+                .collect(Collectors.toMap(Item::getId, i -> i));
 
         List<Forage> result = forageRepository.findByDate(date);
         for (Forage forage : result) {
@@ -43,6 +42,43 @@ public class ForageService {
         }
 
         return result;
+    }
+
+    public Map<Item, Long> countForageItem(LocalDate date) {
+        //CHANGE to bigdecimal
+        return findByDate(date).stream()
+                .collect(Collectors.groupingBy(Forage::getItem,
+                        Collectors.counting()));
+    }
+
+    public List<BigDecimal> valCategoriesPerDay(List<Forage> forages) {
+        List<BigDecimal> total = new ArrayList<>();
+        BigDecimal edibleCount = new BigDecimal(0);
+        BigDecimal inedibleCount = new BigDecimal(0);
+        BigDecimal medicinalCount = new BigDecimal(0);
+        BigDecimal poisonousCount = new BigDecimal(0);
+
+        for (Forage forage : forages) {
+            Category cat = forage.getItem().getCategory();
+            if (cat.equals(Category.EDIBLE)) {
+                edibleCount = edibleCount.add(forage.getValue());
+            }
+            if (cat.equals(Category.INEDIBLE)) {
+                inedibleCount = inedibleCount.add(forage.getValue());
+            }
+            if (cat.equals(Category.MEDICINAL)) {
+                medicinalCount = medicinalCount.add(forage.getValue());
+            }
+            if (cat.equals(Category.POISONOUS)) {
+                poisonousCount = poisonousCount.add(forage.getValue());
+            }
+        }
+        total.add(edibleCount.setScale(2));
+        total.add(inedibleCount.setScale(2));
+        total.add(medicinalCount.setScale(2));
+        total.add(poisonousCount.setScale(2));
+
+        return total;
     }
 
     public Result<Forage> add(Forage forage) throws DataException {
@@ -102,6 +138,8 @@ public class ForageService {
 
         validateChildrenExist(forage, result);
 
+        validateCombination(forage, result);
+
         return result;
     }
 
@@ -147,6 +185,17 @@ public class ForageService {
 
         if (itemRepository.findById(forage.getItem().getId()) == null) {
             result.addErrorMessage("Item does not exist.");
+        }
+    }
+
+    private void validateCombination(Forage forage, Result<Forage> result) {
+        List<Forage> foragesOnDate = forageRepository.findByDate(forage.getDate());
+        for (Forage f : foragesOnDate) {
+            if (forage.getForager().getId().equals(f.getForager().getId()) &&
+                    forage.getItem().getId() == f.getItem().getId()) {
+                result.addErrorMessage(String.format("Forage '%s' '%s' '%s' is a duplicate.", forage.getDate(),
+                        forage.getForager(), forage.getItem()));
+            }
         }
     }
 }

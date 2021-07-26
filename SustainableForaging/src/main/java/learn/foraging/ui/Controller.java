@@ -11,8 +11,12 @@ import learn.foraging.models.Forager;
 import learn.foraging.models.Item;
 import org.springframework.stereotype.Component;
 
+import javax.xml.crypto.Data;
+import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Component
 public class Controller {
@@ -63,12 +67,10 @@ public class Controller {
                     addItem();
                     break;
                 case REPORT_KG_PER_ITEM:
-                    view.displayStatus(false, "NOT IMPLEMENTED");
-                    view.enterToContinue();
+                    reportKgPerItem();
                     break;
                 case REPORT_CATEGORY_VALUE:
-                    view.displayStatus(false, "NOT IMPLEMENTED");
-                    view.enterToContinue();
+                    reportTotalValCategoryPerDay();
                     break;
                 case GENERATE:
                     generate();
@@ -142,6 +144,23 @@ public class Controller {
             String successMessage = String.format("Item %s created.", result.getPayload().getId());
             view.displayStatus(true, successMessage);
         }
+    }
+
+    private void reportKgPerItem(){
+        view.displayHeader(MainMenuOption.REPORT_KG_PER_ITEM.getMessage());
+        LocalDate date = view.getForageDate();
+        Map<Item, Long> itemCount = forageService.countForageItem(date);
+        view.displayHeader(date.toString());
+        view.displayReportItemsCount(itemCount);
+        view.enterToContinue();
+    }
+
+    private void reportTotalValCategoryPerDay() {
+        view.displayHeader(MainMenuOption.REPORT_CATEGORY_VALUE.getMessage());
+        LocalDate date = view.getForageDate();
+        List<Forage> forages = forageService.findByDate(date);
+        List<BigDecimal> total = forageService.valCategoriesPerDay(forages);
+        view.displayReportCatValue(total);
     }
 
     private void generate() throws DataException {

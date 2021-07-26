@@ -1,6 +1,5 @@
 package learn.foraging.data;
 
-import learn.foraging.models.Forage;
 import learn.foraging.models.Forager;
 
 import java.util.List;

@@ -1,7 +1,6 @@
 package learn.foraging.data;
 
 import learn.foraging.models.Category;
-import learn.foraging.models.Forager;
 import learn.foraging.models.Item;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;

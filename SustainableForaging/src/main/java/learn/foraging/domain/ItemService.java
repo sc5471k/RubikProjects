@@ -26,9 +26,6 @@ public class ItemService {
     }
 
     public Result<Item> add(Item item) throws DataException {
-//Category is required.
-// Dollars/Kg must be between $0 (inedible, poisonous) and $7500.
-//Item ID is a system-generated unique sequential integer.
         Result<Item> result = new Result<>();
         if (item == null) {
             result.addErrorMessage("Item must not be null.");
@@ -40,6 +37,10 @@ public class ItemService {
         } else if (repository.findAll().stream()
                 .anyMatch(i -> i.getName().equalsIgnoreCase(item.getName()))) {
             result.addErrorMessage(String.format("Item '%s' is a duplicate.", item.getName()));
+        }
+
+        if (item.getCategory() == null) {
+            result.addErrorMessage("Category is required.");
         }
 
         if (item.getDollarPerKilogram() == null) {

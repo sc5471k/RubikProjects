@@ -2,14 +2,10 @@ package learn.foraging.domain;
 
 import learn.foraging.data.DataException;
 import learn.foraging.data.ForagerRepository;
-import learn.foraging.models.Forage;
 import learn.foraging.models.Forager;
-import learn.foraging.models.Item;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,6 +25,7 @@ public class ForagerService {
         List<Forager> result = repository.findAll();
         return result;
     }
+
     public List<Forager> findByLastName(String prefix) {
         return repository.findAll().stream()
                 .filter(i -> i.getLastName().startsWith(prefix))
@@ -47,11 +44,17 @@ public class ForagerService {
     }
 
     private Result<Forager> validate(Forager forager) {
-        //The combination of first name, last name, and state cannot be duplicated.
         Result<Forager> result = validateNulls(forager);
+
         if (!result.isSuccess()) {
             return result;
         }
+
+        validateCombination(forager, result);
+        if (!result.isSuccess()) {
+            return result;
+        }
+
         return result;
     }
 
@@ -75,9 +78,19 @@ public class ForagerService {
             result.addErrorMessage("State is required.");
         }
         return result;
-        //else if (repository.findAll().stream()
-//                .anyMatch(i -> i.getState().equalsIgnoreCase(forager.getState()))) {
-//            result.addErrorMessage(String.format("Forager state '%s' is a duplicate.", forager.getState()));
-//        }
+    }
+
+    private void validateCombination(Forager forager, Result<Forager> result) {
+        List<Forager> allForages = repository.findAll();
+
+        for (Forager f : allForages) {
+            if (forager.getFirstName().equals(f.getFirstName()) &&
+                    forager.getLastName().equals(f.getLastName()) &&
+                    forager.getState().equals(f.getState())) {
+                result.addErrorMessage(String.format("Forager '%s' '%s' '%s' is a duplicate.", forager.getFirstName(),
+                        forager.getLastName(), forager.getState()));
+            }
+        }
+
     }
 }

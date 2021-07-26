@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
@@ -213,5 +214,26 @@ public class View {
         for (Item item : items) {
             io.printf("%s: %s, %s, %.2f $/kg%n", item.getId(), item.getName(), item.getCategory(), item.getDollarPerKilogram());
         }
+    }
+
+    public void displayReportItemsCount(Map<Item, Long> itemCount) {
+        if (itemCount.size() == 0) {
+            io.println("No items found");
+        }
+
+        for (Item item : itemCount.keySet()) {
+            io.println(item.getName() + ": " + itemCount.get(item));
+        }
+    }
+
+    public void displayReportCatValue(List<BigDecimal> total) {
+        if (total.size() == 0) {
+            io.println("No values found");
+        }
+
+        System.out.println("EDIBLE: " + total.get(0));
+        System.out.println("INEDIBLE: " + total.get(1));
+        System.out.println("MEDICINAL: " + total.get(2));
+        System.out.println("POISONOUS: " + total.get(3));
     }
 }
