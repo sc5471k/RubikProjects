@@ -115,11 +115,11 @@ public class ReservationService {
         return result;
     }
 
-    private void validateFutureDate(Reservation reservation) {
-        //The start date must be in the future.
-        if (reservation.getStartDate().isBefore(LocalDate.now())) {
-            //result.addErrorMessage("Forage date must be in the future.");
-        }
+    private void validateExistence(Reservation reservation, Result<Reservation> result) {
+        //The guest and host must already exist in the "database". Guests and hosts cannot be created.
+
+        //guest = repo.findByID(reservation.getGuestID());
+
     }
 
     private void validateFields(Reservation reservation, Result<Reservation> result) {
@@ -132,10 +132,11 @@ public class ReservationService {
 
     }
 
-    private void validateExistence(Reservation reservation, Result<Reservation> result) {
-        //The guest and host must already exist in the "database". Guests and hosts cannot be created.
-
-        //guest = repo.findByID(reservation.getGuestID());
-
+    private void validateFutureDate(Reservation reservation) {
+        //The start date must be in the future.
+        //You cannot cancel a reservation that's in the past.
+        if (reservation.getStartDate().isBefore(LocalDate.now())) {
+            //result.addErrorMessage("Forage date must be in the future.");
+        }
     }
 }
