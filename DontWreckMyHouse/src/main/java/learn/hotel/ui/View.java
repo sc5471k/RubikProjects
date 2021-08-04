@@ -2,11 +2,14 @@ package learn.hotel.ui;
 
 import learn.hotel.data.DataException;
 import learn.hotel.domain.GuestService;
+import learn.hotel.domain.HostService;
 import learn.hotel.models.Guest;
 import learn.hotel.models.Host;
 import learn.hotel.models.Reservation;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 @Component
@@ -15,12 +18,15 @@ public class View {
     private final ConsoleIO io;
     //CHANGE
     private final GuestService guestService;
+    private final HostService hostService;
+
     private String hostAlignFormat = "| %-15s | %-23s | %-10s | %-15s | %-14s |%n";
     private String reservationAlignFormat = "| %-17s | %-13s | %-11s | %-27s | %-8s |%n";
 
-    public View(ConsoleIO io, GuestService guestService) {
+    public View(ConsoleIO io, GuestService guestService, HostService hostService) {
         this.io = io;
         this.guestService = guestService;
+        this.hostService = hostService;
     }
 
     public MainMenuOption selectMainMenuOption() {
@@ -53,6 +59,39 @@ public class View {
         return hostID;
     }
 
+    public int getGuestID() {
+        int guestID = io.readInt("Enter Guest ID: ");
+        return guestID;
+    }
+
+    public int getReservationID() {
+        int reservationID = io.readInt("Enter Reservation ID: ");
+        return reservationID;
+    }
+
+    public Reservation makeReservation(Host host) {
+        LocalDate startDate = io.readLocalDate("Start date [MM/dd/yyyy]: ");
+        LocalDate endDate = io.readLocalDate("End date [MM/dd/yyyy]: ");
+
+        BigDecimal total = hostService.calculateTotal(host, startDate, endDate);
+
+        displayHeader("Summary");
+        io.println("Start: " + startDate);
+        io.println("End: " + endDate);
+        io.println("Total: " + total);
+        String confirm = io.readString("Is this okay? [y/n]: ").toLowerCase();
+
+        Reservation reservation = new Reservation();
+        if(confirm.equals("y")) {
+            reservation.setStartDate(startDate);
+            reservation.setEndDate(endDate);
+            reservation.setHostID(host.getHostID());
+            reservation.setGuestID(io.readInt("Guest ID: "));
+            reservation.setTotal(total);
+        }
+        return reservation;
+    }
+
     //DISPLAY-----------------------------------------------------------------------------------------------------------
     public void displayHeader(String message) {
         io.println("");
@@ -81,7 +120,7 @@ public class View {
     }
 
     public void displayHost(Host host) {
-        if (host == null) {
+        if (host == null ) {
             io.println("Host does not exist.");
             return;
         }
@@ -110,6 +149,17 @@ public class View {
             io.printf(reservationAlignFormat, reservation.getReservationID(), reservation.getStartDate(),
                     reservation.getEndDate(), guest.getEmail(), reservation.getTotal());
             io.printf("+-------------------+---------------+-------------+-----------------------------+----------+%n");
+        }
+    }
+
+    public void displayStatus(boolean success, String message) {
+        displayStatus(success, List.of(message));
+    }
+
+    public void displayStatus(boolean success, List<String> messages) {
+        displayHeader(success ? "Success" : "Error");
+        for (String message : messages) {
+            io.println(message);
         }
     }
 }

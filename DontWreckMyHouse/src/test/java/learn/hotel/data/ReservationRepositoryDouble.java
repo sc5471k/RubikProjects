@@ -28,4 +28,29 @@ public class ReservationRepositoryDouble implements ReservationRepository {
     public List<Reservation> sortReservationsByDate(String id) {
         return null;
     }
+
+    @Override
+    public List<Reservation> getFutureReservations(String id) {
+        return null;
+    }
+
+    @Override
+    public List<Reservation> getReservationFromHostGuestID(String hostID, int guestID) {
+        return null;
+    }
+
+    @Override
+    public Reservation add(Reservation reservation) throws DataException {
+        return null;
+    }
+
+    @Override
+    public boolean update(Reservation reservation) throws DataException {
+        return false;
+    }
+
+    @Override
+    public boolean delete(int reservationID, String hostID) throws DataException {
+        return false;
+    }
 }

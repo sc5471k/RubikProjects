@@ -4,19 +4,20 @@ import learn.hotel.models.Reservation;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.math.BigDecimal;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Repository
 public class ReservationFileRepository implements ReservationRepository{
 
+    private static final String HEADER = "id,start_date,end_date,guest_id,total";
     private final String directory;
 
     public ReservationFileRepository(@Value("${ReservationFilePath}") String directory){
@@ -43,9 +44,100 @@ public class ReservationFileRepository implements ReservationRepository{
         return result;
     }
 
+    @Override
     public List<Reservation> sortReservationsByDate(String id) {
         return (List<Reservation>) getReservations(id).stream()
-                .sorted(Comparator.comparing(Reservation::getEndDate));
+                .sorted(Comparator.comparing(Reservation::getStartDate));
+    }
+
+    @Override
+    public List<Reservation> getFutureReservations(String id) {
+        return getReservations(id).stream()
+                .filter(reservation -> reservation.getStartDate().isAfter(LocalDate.now()))
+                .sorted(Comparator.comparing(Reservation::getStartDate))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Reservation> getReservationFromHostGuestID(String hostID, int guestID) {
+        return getReservations(hostID).stream()
+                .filter(reservation -> reservation.getGuestID() == guestID)
+                .collect(Collectors.toList());
+    }
+
+    public List<Reservation> getReservationFromID(int reservationID, String hostID) {
+        return getReservations(hostID).stream()
+                .filter(reservation -> reservation.getReservationID() == reservationID)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public Reservation add(Reservation reservation) throws DataException {
+        if (reservation == null) {
+            return null;
+        }
+
+        List<Reservation> all = getReservations(reservation.getHostID());
+
+        int nextId = all.stream()
+                .mapToInt(Reservation::getReservationID)
+                .max()
+                .orElse(0) + 1;
+
+        reservation.setReservationID(nextId);
+
+        all.add(reservation);
+        writeAll(all, reservation.getHostID());
+
+        return reservation;
+    }
+
+    @Override
+    public boolean update(Reservation reservation) throws DataException {
+        List<Reservation> all = getReservations(reservation.getHostID());
+        for (int i = 0; i < all.size(); i++) {
+            if (all.get(i).getGuestID() == reservation.getGuestID()) {
+                all.set(i, reservation);
+                writeAll(all, reservation.getHostID());
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean delete(int reservationID, String hostID) throws DataException {
+        List<Reservation> all = getReservations(hostID);
+        for (int i = 0; i < all.size(); i++) {
+            if (all.get(i).getReservationID() == reservationID && all.get(i).getHostID().equals(hostID)) {
+                all.remove(i);
+                writeAll(all, hostID);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void writeAll(List<Reservation> reservations, String id) throws DataException {
+        try (PrintWriter writer = new PrintWriter(getFilePath(id))) {
+
+            writer.println(HEADER);
+
+            for (Reservation r : reservations) {
+                writer.println(serialize(r));
+            }
+        } catch (FileNotFoundException ex) {
+            throw new DataException(ex);
+        }
+    }
+
+    private String serialize(Reservation reservation) {
+        return String.format("%s,%s,%s,%s,%s",
+                reservation.getReservationID(),
+                reservation.getStartDate(),
+                reservation.getEndDate(),
+                reservation.getGuestID(),
+                reservation.getTotal());
     }
 
     private Reservation deserialize(String[] fields, String id) {
