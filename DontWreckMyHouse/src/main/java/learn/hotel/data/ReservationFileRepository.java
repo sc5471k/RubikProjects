@@ -62,6 +62,8 @@ public class ReservationFileRepository implements ReservationRepository{
     public List<Reservation> getReservationFromHostGuestID(String hostID, int guestID) {
         return getReservations(hostID).stream()
                 .filter(reservation -> reservation.getGuestID() == guestID)
+                .filter(reservation -> reservation.getStartDate().isAfter(LocalDate.now()))
+                .sorted(Comparator.comparing(Reservation::getStartDate))
                 .collect(Collectors.toList());
     }
 
@@ -69,6 +71,7 @@ public class ReservationFileRepository implements ReservationRepository{
     public List<Reservation> getReservationFromReservationHostID(int reservationID, String hostID) {
         return   getReservations(hostID).stream()
                 .filter(reservation -> reservation.getReservationID() == reservationID)
+                .filter(reservation -> reservation.getStartDate().isAfter(LocalDate.now()))
                 .collect(Collectors.toList());
     }
 
