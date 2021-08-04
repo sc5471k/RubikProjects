@@ -40,6 +40,11 @@ public class ReservationRepositoryDouble implements ReservationRepository {
     }
 
     @Override
+    public List<Reservation> getReservationFromReservationHostID(int reservationID, String hostID) {
+        return null;
+    }
+
+    @Override
     public Reservation add(Reservation reservation) throws DataException {
         return null;
     }
@@ -50,7 +55,7 @@ public class ReservationRepositoryDouble implements ReservationRepository {
     }
 
     @Override
-    public boolean delete(int reservationID, String hostID) throws DataException {
+    public boolean delete(List<Reservation> reservation) throws DataException {
         return false;
     }
 }

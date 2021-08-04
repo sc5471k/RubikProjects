@@ -110,7 +110,6 @@ public class Controller {
             Result<Reservation> result = reservationService.add(reservation);
 
             if(result.isSuccess()) {
-                view.displayHeader("Success");
                 String successMessage = String.format("Reservation %s created.", result.getPayload().getReservationID());
                 view.displayStatus(true, successMessage);
             }
@@ -143,7 +142,6 @@ public class Controller {
             Result<Reservation> result = reservationService.update(reservation);
 
             if(result.isSuccess()) {
-                view.displayHeader("Success");
                 String successMessage = String.format("Reservation %s updated.", result.getPayload().getReservationID());
                 view.displayStatus(true, successMessage);
             }
@@ -171,11 +169,11 @@ public class Controller {
             view.displayReservations(reservations);
 
             int reservationID = view.getReservationID();
-            Result<Reservation> result = reservationService.delete(reservationID, hostID);
+            reservations = reservationService.getReservationFromReservationHostID(reservationID, hostID);
+            Result<Reservation> result = reservationService.delete(reservations);
 
             if (result.isSuccess()) {
-                view.displayHeader("Success");
-                String successMessage = String.format("Reservation %s cancelled.", result.getPayload().getReservationID());
+                String successMessage = String.format("Reservation %s cancelled.", reservationID);
                 view.displayStatus(true, successMessage);
             } else {
                 view.displayStatus(false, result.getErrorMessages());

@@ -65,8 +65,9 @@ public class ReservationFileRepository implements ReservationRepository{
                 .collect(Collectors.toList());
     }
 
-    public List<Reservation> getReservationFromID(int reservationID, String hostID) {
-        return getReservations(hostID).stream()
+    @Override
+    public List<Reservation> getReservationFromReservationHostID(int reservationID, String hostID) {
+        return   getReservations(hostID).stream()
                 .filter(reservation -> reservation.getReservationID() == reservationID)
                 .collect(Collectors.toList());
     }
@@ -106,12 +107,13 @@ public class ReservationFileRepository implements ReservationRepository{
     }
 
     @Override
-    public boolean delete(int reservationID, String hostID) throws DataException {
-        List<Reservation> all = getReservations(hostID);
+    public boolean delete(List<Reservation> reservations) throws DataException {
+        Reservation reservation = reservations.get(0);
+        List<Reservation> all = getReservations(reservation.getHostID());
         for (int i = 0; i < all.size(); i++) {
-            if (all.get(i).getReservationID() == reservationID && all.get(i).getHostID().equals(hostID)) {
+            if (all.get(i).getReservationID() == reservation.getReservationID() && all.get(i).getHostID().equals(reservation.getHostID())) {
                 all.remove(i);
-                writeAll(all, hostID);
+                writeAll(all, reservation.getHostID());
                 return true;
             }
         }

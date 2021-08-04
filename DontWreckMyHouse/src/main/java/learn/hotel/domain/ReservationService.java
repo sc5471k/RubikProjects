@@ -57,10 +57,10 @@ public class ReservationService {
         return result;
     }
 
-    public Result delete(int reservationID, String hostID) throws DataException {
-        Result result = new Result()    ;
-        if (!repo.delete(reservationID, hostID)) {
-            String message = String.format("Reservation %s was not found.", reservationID);
+    public Result delete(List<Reservation> reservation) throws DataException {
+        Result result = new Result();
+        if (!repo.delete(reservation)) {
+            String message = String.format("Reservation %s was not found.", reservation.get(0).getReservationID());
             result.addErrorMessage(message);
         }
         return result;
@@ -74,6 +74,11 @@ public class ReservationService {
 
     public List<Reservation> getReservationFromHostGuestID(String hostID, int guestID) {
         List<Reservation> reservations = repo.getReservationFromHostGuestID(hostID, guestID);
+        return reservations;
+    }
+
+    public List<Reservation> getReservationFromReservationHostID(int reservationID, String hostID) {
+        List<Reservation> reservations = repo.getReservationFromReservationHostID(reservationID, hostID);
         return reservations;
     }
 
