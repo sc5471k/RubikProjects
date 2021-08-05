@@ -43,4 +43,15 @@ class GuestFileRepositoryTest {
         assertEquals("(702) 7768761", guest.getPhone());
         assertEquals("NV", guest.getState());
     }
+
+    @Test
+    void findByID() {
+        Guest guest = repo.findByID(1);
+        assertNotNull(guest);
+        assertEquals(1, guest.getGuestID());
+        assertEquals("Sullivan", guest.getFirstName());
+        assertEquals("Lomas", guest.getLastName());
+        assertEquals("(702) 7768761", guest.getPhone());
+        assertEquals("NV", guest.getState());
+    }
 }

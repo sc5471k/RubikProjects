@@ -25,11 +25,6 @@ public class ReservationRepositoryDouble implements ReservationRepository {
     }
 
     @Override
-    public List<Reservation> sortReservationsByDate(String id) {
-        return null;
-    }
-
-    @Override
     public List<Reservation> getFutureReservations(String id) {
         return null;
     }

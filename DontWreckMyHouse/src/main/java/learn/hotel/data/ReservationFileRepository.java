@@ -9,7 +9,6 @@ import java.math.BigDecimal;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -45,12 +44,6 @@ public class ReservationFileRepository implements ReservationRepository{
     }
 
     @Override
-    public List<Reservation> sortReservationsByDate(String id) {
-        return (List<Reservation>) getReservations(id).stream()
-                .sorted(Comparator.comparing(Reservation::getStartDate));
-    }
-
-    @Override
     public List<Reservation> getFutureReservations(String id) {
         return getReservations(id).stream()
                 .filter(reservation -> reservation.getStartDate().isAfter(LocalDate.now()))
@@ -62,7 +55,6 @@ public class ReservationFileRepository implements ReservationRepository{
     public List<Reservation> getReservationFromHostGuestID(String hostID, int guestID) {
         return getReservations(hostID).stream()
                 .filter(reservation -> reservation.getGuestID() == guestID)
-                .filter(reservation -> reservation.getStartDate().isAfter(LocalDate.now()))
                 .sorted(Comparator.comparing(Reservation::getStartDate))
                 .collect(Collectors.toList());
     }
@@ -71,7 +63,6 @@ public class ReservationFileRepository implements ReservationRepository{
     public List<Reservation> getReservationFromReservationHostID(int reservationID, String hostID) {
         return   getReservations(hostID).stream()
                 .filter(reservation -> reservation.getReservationID() == reservationID)
-                .filter(reservation -> reservation.getStartDate().isAfter(LocalDate.now()))
                 .collect(Collectors.toList());
     }
 

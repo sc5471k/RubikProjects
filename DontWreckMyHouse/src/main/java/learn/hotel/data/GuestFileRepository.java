@@ -1,7 +1,6 @@
 package learn.hotel.data;
 
 import learn.hotel.models.Guest;
-import learn.hotel.models.Host;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 

@@ -1,7 +1,6 @@
 package learn.hotel.ui;
 
 import learn.hotel.data.DataException;
-import learn.hotel.domain.GuestService;
 import learn.hotel.domain.HostService;
 import learn.hotel.domain.ReservationService;
 import learn.hotel.domain.Result;
@@ -9,7 +8,6 @@ import learn.hotel.models.Host;
 import learn.hotel.models.Reservation;
 import org.springframework.stereotype.Component;
 
-import java.util.Collections;
 import java.util.List;
 
 @Component
@@ -18,13 +16,11 @@ public class Controller {
     private final View view;
     private final HostService hostService;
     private final ReservationService reservationService;
-    private final GuestService guestService;
 
-    public Controller(View view, HostService hostService, ReservationService reservationService, GuestService guestService) {
+    public Controller(View view, HostService hostService, ReservationService reservationService) {
         this.view = view;
         this.hostService = hostService;
         this.reservationService = reservationService;
-        this.guestService = guestService;
     }
 
     public void run() {
@@ -59,8 +55,8 @@ public class Controller {
     }
 
     private void viewReservation() {
-        String hostID = "";
-        Host host = null;
+        String hostID;
+        Host host;
 
         int option = view.chooseHostOption();
 
@@ -85,8 +81,8 @@ public class Controller {
     }
 
     private void addReservation() throws DataException {
-        String hostID = "";
-        Host host = null;
+        String hostID;
+        Host host;
 
         view.displayHeader(MainMenuOption.ADD_RESERVATION.getMessage());
         int option = view.chooseHostOption();
@@ -123,7 +119,7 @@ public class Controller {
     }
 
     private void updateReservation() throws DataException {
-        Host host = null;
+        Host host;
 
         view.displayHeader("Edit a Reservation");
         int guestID = view.getGuestID();
@@ -135,18 +131,24 @@ public class Controller {
             view.displayHeader("\nReservations - " + host.getLastName());
             view.displayReservations(reservations);
 
-            int reservationID =view.getReservationID();
-            view.displayHeader("\nEditing Reservation " + reservationID);
+            if(reservations.size() != 0) {
+                int reservationID =view.getReservationID();
+                view.displayHeader("\nEditing Reservation " + reservationID);
 
-            Reservation reservation = view.makeReservation(host);
-            Result<Reservation> result = reservationService.update(reservation);
+                Reservation reservation = view.makeReservation(host);
+                reservation.setReservationID(reservationID);
+                Result<Reservation> result = reservationService.update(reservation);
 
-            if(result.isSuccess()) {
-                String successMessage = String.format("Reservation %s updated.", result.getPayload().getReservationID());
-                view.displayStatus(true, successMessage);
+                if(result.isSuccess()) {
+                    String successMessage = String.format("Reservation %s updated.", result.getPayload().getReservationID());
+                    view.displayStatus(true, successMessage);
+                }
+                else {
+                    view.displayStatus(false, result.getErrorMessages());
+                }
             }
             else {
-                view.displayStatus(false, result.getErrorMessages());
+                return;
             }
         }
         else {
@@ -155,7 +157,7 @@ public class Controller {
     }
 
     private void deleteReservation() throws DataException {
-        Host host = null;
+        Host host;
 
         view.displayHeader("Cancel a Reservation");
 
@@ -168,16 +170,24 @@ public class Controller {
             view.displayHeader("\nReservations - " + host.getLastName());
             view.displayReservations(reservations);
 
-            int reservationID = view.getReservationID();
-            reservations = reservationService.getReservationFromReservationHostID(reservationID, hostID);
-            Result<Reservation> result = reservationService.delete(reservations);
+            if(reservations.size() != 0) {
+                int reservationID = view.getReservationID();
+                reservations = reservationService.getReservationFromReservationHostID(reservationID, hostID);
+                Result result = reservationService.delete(reservations);
 
-            if (result.isSuccess()) {
-                String successMessage = String.format("Reservation %s cancelled.", reservationID);
-                view.displayStatus(true, successMessage);
-            } else {
-                view.displayStatus(false, result.getErrorMessages());
+                if (result.isSuccess()) {
+                    String successMessage = String.format("Reservation %s cancelled.", reservationID);
+                    view.displayStatus(true, successMessage);
+                } else {
+                    view.displayStatus(false, result.getErrorMessages());
+                }
             }
+            else {
+                return;
+            }
+        }
+        else {
+            return;
         }
     }
 }

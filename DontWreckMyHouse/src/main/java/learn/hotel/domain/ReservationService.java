@@ -5,11 +5,7 @@ import learn.hotel.data.ReservationRepository;
 import learn.hotel.models.Reservation;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
-import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -17,23 +13,23 @@ import java.util.List;
 public class ReservationService {
 
     private final ReservationRepository repo;
+    private final HostService hostService;
+    private final GuestService guestService;
 
-    public ReservationService(ReservationRepository repo) {
+    public ReservationService(ReservationRepository repo, HostService hostService, GuestService guestService) {
         this.repo = repo;
+        this.hostService = hostService;
+        this.guestService = guestService;
     }
 
     public List<Reservation> getReservations(String hostID) {
         List<Reservation> reservations = repo.getReservations(hostID);
-        Collections.sort(reservations, Comparator.comparing(Reservation::getStartDate));
+        reservations.sort(Comparator.comparing(Reservation::getStartDate));
         return reservations;
     }
 
     public Result<Reservation> add(Reservation reservation) throws DataException {
-        Result<Reservation> result = validate(reservation);
-
-        //CHANGE
-        //result = validateFutureDate(reservation);
-        //CHANGE
+        Result<Reservation> result = validate(reservation, "Add");
         if (!result.isSuccess()) {
             return result;
         }
@@ -43,14 +39,14 @@ public class ReservationService {
     }
 
     public Result<Reservation> update(Reservation reservation) throws DataException {
-        Result<Reservation> result = validate(reservation);
+        Result<Reservation> result = validate(reservation, "Update");
         if (!result.isSuccess()) {
             return result;
         }
         if (repo.update(reservation)) {
             result.setPayload(reservation);
         } else {
-            String message = String.format("Reservation id %s was not found.", reservation.getReservationID());
+            String message = String.format("Reservation %s was not found.", reservation.getReservationID());
             result.addErrorMessage(message);
         }
 
@@ -58,7 +54,10 @@ public class ReservationService {
     }
 
     public Result delete(List<Reservation> reservation) throws DataException {
-        Result result = new Result();
+        Result<Reservation> result = validateFutureDateDelete(reservation);
+        if (!result.isSuccess()) {
+            return result;
+        }
         if (!repo.delete(reservation)) {
             String message = String.format("Reservation %s was not found.", reservation.get(0).getReservationID());
             result.addErrorMessage(message);
@@ -68,46 +67,68 @@ public class ReservationService {
 
     public List<Reservation> getFutureReservations(String hostID) {
         List<Reservation> futureReservations = repo.getFutureReservations(hostID);
-        Collections.sort(futureReservations, Comparator.comparing(Reservation::getStartDate));
+        futureReservations.sort(Comparator.comparing(Reservation::getStartDate));
         return futureReservations;
     }
 
     public List<Reservation> getReservationFromHostGuestID(String hostID, int guestID) {
-        List<Reservation> reservations = repo.getReservationFromHostGuestID(hostID, guestID);
-        return reservations;
+        return repo.getReservationFromHostGuestID(hostID, guestID);
     }
 
     public List<Reservation> getReservationFromReservationHostID(int reservationID, String hostID) {
-        List<Reservation> reservations = repo.getReservationFromReservationHostID(reservationID, hostID);
-        return reservations;
+        return repo.getReservationFromReservationHostID(reservationID, hostID);
     }
 
-    private Result<Reservation> validate(Reservation reservation) {
+    //validate for add and update
+    private Result<Reservation> validate(Reservation reservation, String option) {
         Result<Reservation> result = validateNulls(reservation);
         if (!result.isSuccess()) {
             return result;
         }
 
-        validateFields(reservation, result);
+        result = hostService.validateHostExistence(reservation, result);
         if (!result.isSuccess()) {
             return result;
         }
 
-        validateExistence(reservation, result);
+        result = guestService.validateGuestExistence(reservation, result);
+        if (!result.isSuccess()) {
+            return result;
+        }
+
+        validateStartDate(reservation, result);
+        if (!result.isSuccess()) {
+            return result;
+        }
+
+        validateDateOverlap(reservation, result);
+        if (!result.isSuccess()) {
+            return result;
+        }
+
+        if (option.equals("Add")) {
+            validateFutureDateAdd(reservation, result);
+            if (!result.isSuccess()) {
+                return result;
+            }
+        }
 
         return result;
     }
 
     private Result<Reservation> validateNulls(Reservation reservation) {
+        //Guest, host, and start and end dates are required.
+        //guest is int so cant be null
         Result<Reservation> result = new Result<>();
 
         if(reservation == null) {
             result.addErrorMessage("Nothing to save.");
-            return result;
+        }
+        if (reservation.getHostID() == null) {
+            result.addErrorMessage("Host is required.");
         }
         if (reservation.getStartDate() == null) {
             result.addErrorMessage("Start date is required.");
-
         }
         if (reservation.getEndDate() == null) {
             result.addErrorMessage("End date is required.");
@@ -115,28 +136,38 @@ public class ReservationService {
         return result;
     }
 
-    private void validateExistence(Reservation reservation, Result<Reservation> result) {
-        //The guest and host must already exist in the "database". Guests and hosts cannot be created.
-
-        //guest = repo.findByID(reservation.getGuestID());
-
-    }
-
-    private void validateFields(Reservation reservation, Result<Reservation> result) {
+    private void validateStartDate(Reservation reservation, Result<Reservation> result) {
         //The start date must come before the end date
         if (reservation.getStartDate().isAfter(reservation.getEndDate())) {
             result.addErrorMessage("Start date must come before the end date.");
         }
-
-        //The reservation may never overlap existing reservation dates.
-
     }
 
-    private void validateFutureDate(Reservation reservation) {
-        //The start date must be in the future.
-        //You cannot cancel a reservation that's in the past.
-        if (reservation.getStartDate().isBefore(LocalDate.now())) {
-            //result.addErrorMessage("Forage date must be in the future.");
+    private void validateDateOverlap(Reservation reservation, Result<Reservation> result) {
+        //The reservation may never overlap existing reservation dates.
+        List<Reservation> reservations = repo.getReservations(reservation.getHostID());
+        for(Reservation r : reservations) {
+            if(r.getStartDate() == reservation.getStartDate() && r.getEndDate() == reservation.getEndDate()) {
+                result.addErrorMessage("The reservation may never overlap existing reservation dates");
+            }
         }
+    }
+
+    private void validateFutureDateAdd(Reservation reservation, Result<Reservation> result) {
+        //The start date must be in the future.
+
+        if (reservation.getStartDate().isBefore(LocalDate.now())) {
+            result.addErrorMessage("Reservation date must be in the future.");
+        }
+    }
+
+    private Result<Reservation> validateFutureDateDelete(List<Reservation> reservation) {
+        //You cannot cancel a reservation that's in the past.
+        Result<Reservation> result = new Result<>();
+
+        if (reservation.get(0).getStartDate().isBefore(LocalDate.now()) || reservation.get(0).getEndDate().isBefore(LocalDate.now())) {
+            result.addErrorMessage("Reservation date must be in the future.");
+        }
+        return result;
     }
 }

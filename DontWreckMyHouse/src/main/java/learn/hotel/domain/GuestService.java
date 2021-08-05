@@ -2,6 +2,7 @@ package learn.hotel.domain;
 
 import learn.hotel.data.GuestRepository;
 import learn.hotel.models.Guest;
+import learn.hotel.models.Reservation;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,8 +26,13 @@ public class GuestService {
         return guest;
     }
 
-    public Guest findByEmail(String email) {
-        Guest guest = repo.findByEmail(email);
-        return guest;
+    public Result<Reservation> validateGuestExistence(Reservation reservation, Result<Reservation> result) {
+        //The guest must already exist in the "database". Cannot be created.
+        Guest guest = repo.findByID(reservation.getGuestID());
+        if(guest.getGuestID() != reservation.getGuestID()) {
+            result.addErrorMessage("Guest must already exist");
+        }
+
+        return result;
     }
 }

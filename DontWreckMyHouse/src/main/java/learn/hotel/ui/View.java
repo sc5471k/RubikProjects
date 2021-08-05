@@ -20,8 +20,7 @@ public class View {
     private final GuestService guestService;
     private final HostService hostService;
 
-    private String hostAlignFormat = "| %-15s | %-23s | %-10s | %-15s | %-14s |%n";
-    private String reservationAlignFormat = "| %-17s | %-13s | %-11s | %-27s | %-8s |%n";
+    private final String hostAlignFormat = "| %-15s | %-23s | %-10s | %-15s | %-14s |%n";
 
     public View(ConsoleIO io, GuestService guestService, HostService hostService) {
         this.io = io;
@@ -49,24 +48,20 @@ public class View {
         displayHeader(MainMenuOption.VIEW_RESERVATION.getMessage());
         io.println("1. Search for host");
         io.println("2. Search host by ID");
-        int option = io.readInt("Select an option [1-2]: ");
 
-        return option;
+        return io.readInt("Select an option [1-2]: ");
     }
 
     public String getHostID() {
-        String hostID = io.readString("Enter Host ID: ");
-        return hostID;
+        return io.readString("Enter Host ID: ");
     }
 
     public int getGuestID() {
-        int guestID = io.readInt("Enter Guest ID: ");
-        return guestID;
+        return io.readInt("Enter Guest ID: ");
     }
 
     public int getReservationID() {
-        int reservationID = io.readInt("Enter Reservation ID: ");
-        return reservationID;
+        return io.readInt("Enter Reservation ID: ");
     }
 
     public Reservation makeReservation(Host host) {
@@ -146,6 +141,7 @@ public class View {
             //CHANGE
             guest = guestService.findByID(reservation.getGuestID());
             //CHANGE
+            String reservationAlignFormat = "| %-17s | %-13s | %-11s | %-27s | %-8s |%n";
             io.printf(reservationAlignFormat, reservation.getReservationID(), reservation.getStartDate(),
                     reservation.getEndDate(), guest.getEmail(), reservation.getTotal());
             io.printf("+-------------------+---------------+-------------+-----------------------------+----------+%n");
