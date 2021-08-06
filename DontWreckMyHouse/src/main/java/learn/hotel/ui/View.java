@@ -16,7 +16,6 @@ import java.util.List;
 public class View {
 
     private final ConsoleIO io;
-    //CHANGE
     private final GuestService guestService;
     private final HostService hostService;
 
@@ -160,9 +159,7 @@ public class View {
         io.printf("| Reservation ID    | Start Date    | End Date    | Guest Email                 | Total    |%n");
         io.printf("+-------------------+---------------+-------------+-----------------------------+----------+%n");
         for (Reservation reservation : reservations) {
-            //CHANGE
             guest = guestService.findByID(reservation.getGuestID());
-            //CHANGE
             String reservationAlignFormat = "| %-17s | %-13s | %-11s | %-27s | %-8s |%n";
             io.printf(reservationAlignFormat, reservation.getReservationID(), reservation.getStartDate(),
                     reservation.getEndDate(), guest.getEmail(), reservation.getTotal());

@@ -160,7 +160,6 @@ public class ReservationService {
 
     public void validateFutureDateAdd(Reservation reservation, Result<Reservation> result) {
         //The start date must be in the future.
-
         if (reservation.getStartDate().isBefore(LocalDate.now())) {
             result.addErrorMessage("Reservation date must be in the future.");
         }
