@@ -25,6 +25,8 @@ public class ReservationRepositoryDouble implements ReservationRepository {
         reservation.setEndDate(LocalDate.parse("2021-10-14"));
         reservation.setGuestID(663);
         reservation.setTotal(BigDecimal.valueOf(400));
+
+        reservations.add(reservation);
     }
 
     @Override

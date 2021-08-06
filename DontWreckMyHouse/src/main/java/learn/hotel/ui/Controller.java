@@ -58,6 +58,7 @@ public class Controller {
         String hostID;
         Host host;
 
+        view.displayHeader(MainMenuOption.VIEW_RESERVATION.getMessage());
         int option = view.chooseHostOption();
 
         view.displayHeader("\nSearch Host");

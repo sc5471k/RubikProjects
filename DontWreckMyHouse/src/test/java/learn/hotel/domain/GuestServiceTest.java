@@ -22,4 +22,10 @@ class GuestServiceTest {
         Guest guest = service.findByID(1);
         assertEquals("Sammi", guest.getFirstName());
     }
+
+    @Test
+    void shouldNotFindGuestExistence() {
+        Guest guest = service.findByID(3);
+        assertNull(guest);
+    }
 }

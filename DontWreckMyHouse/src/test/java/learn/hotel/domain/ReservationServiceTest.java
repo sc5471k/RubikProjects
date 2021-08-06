@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ReservationServiceTest {
 
@@ -32,7 +33,33 @@ class ReservationServiceTest {
     }
 
     @Test
-    void validateReservation() {
+    void shouldFindReservation() {
+        Result<Reservation> result = new Result<>();
+        Reservation reservation = new Reservation();
+        List<Reservation> reservationList = new ArrayList<>();
+
+        reservation.setHostID("1");
+        reservation.setReservationID(6);
+        reservation.setStartDate(LocalDate.now().plusDays(5));
+        reservation.setEndDate(LocalDate.now().plusDays(10));
+        reservation.setGuestID(5);
+        reservation.setTotal(BigDecimal.valueOf(700));
+        reservationList.add(reservation);
+
+        reservation.setHostID("2");
+        reservation.setReservationID(8);
+        reservation.setStartDate(LocalDate.now().plusDays(10));
+        reservation.setEndDate(LocalDate.now().plusDays(15));
+        reservation.setGuestID(5);
+        reservation.setTotal(BigDecimal.valueOf(700));
+        reservationList.add(reservation);
+
+        service.validateReservation(reservationList, 8, result);
+        assertTrue(result.isSuccess());
+    }
+
+    @Test
+    void shouldNotFindReservation() {
         Result<Reservation> result = new Result<>();
         Reservation reservation = new Reservation();
         List<Reservation> reservationList = new ArrayList<>();
@@ -59,7 +86,23 @@ class ReservationServiceTest {
 
     //    The start date must come before the end date.
     @Test
-    void validateStartDate() {
+    void shouldAcceptStartDate() {
+        Result<Reservation> result = new Result<>();
+        Reservation reservation = new Reservation();
+
+        reservation.setHostID("1");
+        reservation.setReservationID(6);
+        reservation.setStartDate(LocalDate.now());
+        reservation.setEndDate(LocalDate.now().plusDays(5));
+        reservation.setGuestID(5);
+        reservation.setTotal(BigDecimal.valueOf(700));
+
+        service.validateStartDate(reservation, result);
+        assertTrue(result.isSuccess());
+    }
+
+    @Test
+    void shouldNotAcceptStartDate() {
         Result<Reservation> result = new Result<>();
         Reservation reservation = new Reservation();
 
@@ -82,18 +125,10 @@ class ReservationServiceTest {
         List<Reservation> reservationList = new ArrayList<>();
 
         reservation.setHostID("1");
-        reservation.setReservationID(6);
-        reservation.setStartDate(LocalDate.now().plusDays(5));
-        reservation.setEndDate(LocalDate.now().plusDays(10));
-        reservation.setGuestID(5);
-        reservation.setTotal(BigDecimal.valueOf(700));
-        reservationList.add(reservation);
-
-        reservation.setHostID("1");
         reservation.setReservationID(8);
-        reservation.setStartDate(LocalDate.now().plusDays(5));
-        reservation.setEndDate(LocalDate.now().plusDays(10));
-        reservation.setGuestID(5);
+        reservation.setStartDate(LocalDate.parse("2021-10-13"));
+        reservation.setEndDate(LocalDate.parse("2021-10-18"));
+        reservation.setGuestID(6);
         reservation.setTotal(BigDecimal.valueOf(700));
         reservationList.add(reservation);
 
@@ -103,7 +138,23 @@ class ReservationServiceTest {
 
     //    The start date must be in the future.
     @Test
-    void validateFutureStartDate() {
+    void shouldAcceptFutureStartDate() {
+        Result<Reservation> result = new Result<>();
+        Reservation reservation = new Reservation();
+
+        reservation.setHostID("1");
+        reservation.setReservationID(6);
+        reservation.setStartDate(LocalDate.now().plusDays(5));
+        reservation.setEndDate(LocalDate.now().plusDays(10));
+        reservation.setGuestID(5);
+        reservation.setTotal(BigDecimal.valueOf(700));
+
+        service.validateFutureDateAdd(reservation, result);
+        assertTrue(result.isSuccess());
+    }
+
+    @Test
+    void shouldNotAcceptPastStartDate() {
         Result<Reservation> result = new Result<>();
         Reservation reservation = new Reservation();
 
@@ -120,7 +171,23 @@ class ReservationServiceTest {
 
     //    You cannot cancel a reservation that's in the past.
     @Test
-    void validateCancel() {
+    void shouldAcceptCancel() {
+        Result<Reservation> result;
+        Reservation reservation = new Reservation();
+
+        reservation.setHostID("1");
+        reservation.setReservationID(6);
+        reservation.setStartDate(LocalDate.now().plusDays(5));
+        reservation.setEndDate(LocalDate.now().plusDays(10));
+        reservation.setGuestID(5);
+        reservation.setTotal(BigDecimal.valueOf(700));
+
+        result = service.validateFutureDateDelete(reservation);
+        assertTrue(result.isSuccess());
+    }
+
+    @Test
+    void shouldNotAcceptCancel() {
         Result<Reservation> result;
         Reservation reservation = new Reservation();
 

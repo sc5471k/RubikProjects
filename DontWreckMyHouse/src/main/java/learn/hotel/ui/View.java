@@ -45,7 +45,6 @@ public class View {
     }
 
     public int chooseHostOption() {
-        displayHeader(MainMenuOption.VIEW_RESERVATION.getMessage());
         io.println("1. Search for host");
         io.println("2. Search host by ID");
 

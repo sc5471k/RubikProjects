@@ -151,8 +151,9 @@ public class ReservationService {
         //The reservation may never overlap existing reservation dates.
         List<Reservation> reservations = repo.getReservations(reservation.getHostID());
         for (Reservation r : reservations) {
-            if (r.getStartDate() == reservation.getStartDate() && r.getEndDate() == reservation.getEndDate()) {
+            if(reservation.getStartDate().isBefore(r.getEndDate())) {
                 result.addErrorMessage("The reservation may never overlap existing reservation dates");
+                return;
             }
         }
     }

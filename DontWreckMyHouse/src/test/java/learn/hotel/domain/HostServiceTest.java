@@ -27,6 +27,12 @@ class HostServiceTest {
     }
 
     @Test
+    void shouldNotFindHostExistence() {
+        Host host = service.findByID("3");
+        assertNull(host);
+    }
+
+    @Test
     void calculateTotal() {
         Host host = service.findByID("1");
         LocalDate startDate = LocalDate.parse("2021-08-05");
