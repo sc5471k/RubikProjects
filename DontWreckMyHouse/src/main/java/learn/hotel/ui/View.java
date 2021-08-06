@@ -77,7 +77,7 @@ public class View {
         String confirm = io.readString("Is this okay? [y/n]: ").toLowerCase();
 
         Reservation reservation = new Reservation();
-        if(confirm.equals("y")) {
+        if (confirm.equals("y")) {
             reservation.setStartDate(startDate);
             reservation.setEndDate(endDate);
             reservation.setHostID(host.getHostID());
@@ -99,7 +99,7 @@ public class View {
         io.println("Total: " + total);
         String confirm = io.readString("Is this okay? [y/n]: ").toLowerCase();
 
-        if(confirm.equals("y")) {
+        if (confirm.equals("y")) {
             reservation.setStartDate(startDate);
             reservation.setEndDate(endDate);
             reservation.setHostID(host.getHostID());
@@ -137,7 +137,7 @@ public class View {
     }
 
     public void displayHost(Host host) {
-        if (host == null ) {
+        if (host == null) {
             io.println("Host does not exist.");
             return;
         }
