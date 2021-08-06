@@ -17,19 +17,17 @@ public class GuestService {
     }
 
     public List<Guest> findAll() {
-        List<Guest> guests = repo.findAll();
-        return guests;
+        return repo.findAll();
     }
 
     public Guest findByID(int id) {
-        Guest guest = repo.findByID(id);
-        return guest;
+        return repo.findByID(id);
     }
 
     public Result<Reservation> validateGuestExistence(Reservation reservation, Result<Reservation> result) {
         //The guest must already exist in the "database". Cannot be created.
         Guest guest = repo.findByID(reservation.getGuestID());
-        if(guest.getGuestID() != reservation.getGuestID()) {
+        if (guest == null) {
             result.addErrorMessage("Guest must already exist");
         }
 

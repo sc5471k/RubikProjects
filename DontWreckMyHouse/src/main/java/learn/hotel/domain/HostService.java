@@ -1,7 +1,6 @@
 package learn.hotel.domain;
 
 import learn.hotel.data.HostRepository;
-import learn.hotel.models.Guest;
 import learn.hotel.models.Host;
 import learn.hotel.models.Reservation;
 import org.springframework.stereotype.Service;
@@ -21,13 +20,11 @@ public class HostService {
     }
 
     public List<Host> findAll() {
-        List<Host> hosts = repo.findAll();
-        return hosts;
+        return repo.findAll();
     }
 
     public Host findByID(String id) {
-        Host host = repo.findByID(id);
-        return host;
+        return repo.findByID(id);
     }
 
     public BigDecimal calculateTotal(Host host, LocalDate startDate, LocalDate endDate) {
@@ -40,21 +37,19 @@ public class HostService {
         for (LocalDate current = startDate; current.compareTo(endDate) <= 0; current = current.plusDays(1)) {
             if (current.getDayOfWeek() == DayOfWeek.SATURDAY || current.getDayOfWeek() == DayOfWeek.SUNDAY) {
                 weekendCount++;
-            }
-            else {
+            } else {
                 weekdayCount++;
             }
         }
 
-        BigDecimal total = new BigDecimal(weekendCount).multiply(weekendRate).add(new BigDecimal(weekdayCount).multiply(standardRate));
-        return total;
+        return new BigDecimal(weekendCount).multiply(weekendRate).add(new BigDecimal(weekdayCount).multiply(standardRate));
     }
 
     public Result<Reservation> validateHostExistence(Reservation reservation, Result<Reservation> result) {
         //The host must already exist in the "database". Cannot be created.
         Host host = repo.findByID(reservation.getHostID());
 
-        if(!host.getHostID().equals(reservation.getHostID())) {
+        if (!host.getHostID().equals(reservation.getHostID())) {
             result.addErrorMessage("Host must already exist");
         }
         return result;

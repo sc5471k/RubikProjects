@@ -13,7 +13,6 @@ import java.util.List;
 
 @Repository
 public class HostFileRepository implements HostRepository {
-    private static final String HEADER = "id,last_name,email,phone,address,city,state,postal_code,standard_rate,weekend_rate";
     private final String directory;
 
     public HostFileRepository(@Value("${HostFilePath}") String directory) {

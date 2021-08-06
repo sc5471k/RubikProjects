@@ -1,6 +1,5 @@
 package learn.hotel.data;
 
-import learn.hotel.domain.ReservationService;
 import learn.hotel.models.Reservation;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,13 +33,13 @@ class ReservationFileRepositoryTest {
     @Test
     void getReservations() {
         List<Reservation> reservations = repo.getReservations("1");
-        assertEquals(5, reservations.size());
+        assertEquals(6, reservations.size());
     }
 
     @Test
     void getFutureReservations() {
         List<Reservation> reservations = repo.getFutureReservations("1");
-        assertEquals(4, reservations.size());
+        assertEquals(5, reservations.size());
     }
 
     @Test
@@ -50,11 +49,20 @@ class ReservationFileRepositoryTest {
     }
 
     @Test
+    void getReservationFromHostGuestIDFutureDates() {
+        List<Reservation> allReservations = repo.getReservationFromHostGuestID("1", 1);
+        List<Reservation> reservations = repo.getReservationFromHostGuestIDFutureDates("1", 1);
+
+        assertEquals(2, allReservations.size());
+        assertEquals(1, reservations.size());
+    }
+
+    @Test
     void getReservationFromReservationHostID() {
-        List<Reservation> reservations = repo.getReservationFromReservationHostID(1, "1");
-        assertEquals(1, reservations.get(0).getReservationID());
-        assertEquals(663, reservations.get(0).getGuestID());
-        assertEquals(BigDecimal.valueOf(400), reservations.get(0).getTotal());
+        Reservation reservation = repo.getReservationFromReservationHostID(1, "1");
+        assertEquals(1, reservation.getReservationID());
+        assertEquals(663, reservation.getGuestID());
+        assertEquals(BigDecimal.valueOf(400), reservation.getTotal());
     }
 
     @Test
@@ -69,7 +77,7 @@ class ReservationFileRepositoryTest {
 
         repo.add(reservation);
         List<Reservation> list = repo.getReservations("1");
-        assertEquals(6, list.size());
+        assertEquals(7, list.size());
     }
 
     @Test
@@ -91,8 +99,8 @@ class ReservationFileRepositoryTest {
     @Test
     void delete() throws DataException {
         int count = repo.getReservations("1").size();
-        List<Reservation> list = repo.getReservationFromHostGuestID("1", 1);
-        assertTrue(repo.delete(list));
-        assertEquals(count -1, repo.getReservations("1").size());
+        Reservation reservation = repo.getReservationFromReservationHostID(1, "1");
+        assertTrue(repo.delete(reservation));
+        assertEquals(count - 1, repo.getReservations("1").size());
     }
 }

@@ -53,13 +53,13 @@ public class ReservationService {
         return result;
     }
 
-    public Result delete(List<Reservation> reservation) throws DataException {
+    public Result delete(Reservation reservation) throws DataException {
         Result<Reservation> result = validateFutureDateDelete(reservation);
         if (!result.isSuccess()) {
             return result;
         }
         if (!repo.delete(reservation)) {
-            String message = String.format("Reservation %s was not found.", reservation.get(0).getReservationID());
+            String message = String.format("Reservation %s was not found.", reservation.getReservationID());
             result.addErrorMessage(message);
         }
         return result;
@@ -75,7 +75,11 @@ public class ReservationService {
         return repo.getReservationFromHostGuestID(hostID, guestID);
     }
 
-    public List<Reservation> getReservationFromReservationHostID(int reservationID, String hostID) {
+    public List<Reservation> getReservationFromHostGuestIDFutureDates(String hostID, int guestID) {
+        return repo.getReservationFromHostGuestIDFutureDates(hostID, guestID);
+    }
+
+    public Reservation getReservationFromReservationHostID(int reservationID, String hostID) {
         return repo.getReservationFromReservationHostID(reservationID, hostID);
     }
 
@@ -121,7 +125,7 @@ public class ReservationService {
         //guest is int so cant be null
         Result<Reservation> result = new Result<>();
 
-        if(reservation == null) {
+        if (reservation == null) {
             result.addErrorMessage("Nothing to save.");
         }
         if (reservation.getHostID() == null) {
@@ -136,24 +140,24 @@ public class ReservationService {
         return result;
     }
 
-    private void validateStartDate(Reservation reservation, Result<Reservation> result) {
+    public void validateStartDate(Reservation reservation, Result<Reservation> result) {
         //The start date must come before the end date
         if (reservation.getStartDate().isAfter(reservation.getEndDate())) {
             result.addErrorMessage("Start date must come before the end date.");
         }
     }
 
-    private void validateDateOverlap(Reservation reservation, Result<Reservation> result) {
+    public void validateDateOverlap(Reservation reservation, Result<Reservation> result) {
         //The reservation may never overlap existing reservation dates.
         List<Reservation> reservations = repo.getReservations(reservation.getHostID());
-        for(Reservation r : reservations) {
-            if(r.getStartDate() == reservation.getStartDate() && r.getEndDate() == reservation.getEndDate()) {
+        for (Reservation r : reservations) {
+            if (r.getStartDate() == reservation.getStartDate() && r.getEndDate() == reservation.getEndDate()) {
                 result.addErrorMessage("The reservation may never overlap existing reservation dates");
             }
         }
     }
 
-    private void validateFutureDateAdd(Reservation reservation, Result<Reservation> result) {
+    public void validateFutureDateAdd(Reservation reservation, Result<Reservation> result) {
         //The start date must be in the future.
 
         if (reservation.getStartDate().isBefore(LocalDate.now())) {
@@ -161,12 +165,21 @@ public class ReservationService {
         }
     }
 
-    private Result<Reservation> validateFutureDateDelete(List<Reservation> reservation) {
+    public Result<Reservation> validateFutureDateDelete(Reservation reservation) {
         //You cannot cancel a reservation that's in the past.
         Result<Reservation> result = new Result<>();
 
-        if (reservation.get(0).getStartDate().isBefore(LocalDate.now()) || reservation.get(0).getEndDate().isBefore(LocalDate.now())) {
+        if (reservation.getStartDate().isBefore(LocalDate.now()) || reservation.getEndDate().isBefore(LocalDate.now())) {
             result.addErrorMessage("Reservation date must be in the future.");
+        }
+        return result;
+    }
+
+    public Result<Reservation> validateReservation(List<Reservation> reservations, int reservationID, Result<Reservation> result) {
+        for (Reservation reservation : reservations) {
+            if (reservation.getReservationID() != reservationID) {
+                result.addErrorMessage("Reservation can't be found");
+            }
         }
         return result;
     }

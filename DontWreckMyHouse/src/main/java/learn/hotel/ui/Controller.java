@@ -61,7 +61,7 @@ public class Controller {
         int option = view.chooseHostOption();
 
         view.displayHeader("\nSearch Host");
-        if(option == 1) {
+        if (option == 1) {
             List<Host> hosts = hostService.findAll();
             view.displayHosts(hosts);
         }
@@ -70,12 +70,11 @@ public class Controller {
         host = hostService.findByID(hostID);
         view.displayHost(host);
 
-        if(host != null) {
+        if (host != null) {
             List<Reservation> reservations = reservationService.getReservations(hostID);
             view.displayHeader("\nReservations - " + host.getLastName());
             view.displayReservations(reservations);
-        }
-        else {
+        } else {
             return;
         }
     }
@@ -88,7 +87,7 @@ public class Controller {
         int option = view.chooseHostOption();
 
         view.displayHeader("\nSearch Host");
-        if(option == 1) {
+        if (option == 1) {
             List<Host> hosts = hostService.findAll();
             view.displayHosts(hosts);
         }
@@ -97,67 +96,78 @@ public class Controller {
         host = hostService.findByID(hostID);
         view.displayHost(host);
 
-        if(host != null) {
+        if (host != null) {
             List<Reservation> futureReservations = reservationService.getFutureReservations(hostID);
             view.displayHeader("\nReservations - " + host.getLastName());
             view.displayReservations(futureReservations);
 
             Reservation reservation = view.makeReservation(host);
+
+            //if user doesn't continue [n], no set. So hostID null
+            if (reservation.getHostID() == null) {
+                return;
+            }
             Result<Reservation> result = reservationService.add(reservation);
 
-            if(result.isSuccess()) {
+            if (result.isSuccess()) {
                 String successMessage = String.format("Reservation %s created.", result.getPayload().getReservationID());
                 view.displayStatus(true, successMessage);
-            }
-            else {
+            } else {
                 view.displayStatus(false, result.getErrorMessages());
             }
-        }
-        else {
+        } else {
             return;
         }
     }
 
     private void updateReservation() throws DataException {
         Host host;
+        Result<Reservation> result = new Result<>();
 
         view.displayHeader("Edit a Reservation");
         int guestID = view.getGuestID();
         String hostID = view.getHostID();
         host = hostService.findByID(hostID);
 
-        if(host != null) {
+        if (host != null) {
             List<Reservation> reservations = reservationService.getReservationFromHostGuestID(hostID, guestID);
             view.displayHeader("\nReservations - " + host.getLastName());
             view.displayReservations(reservations);
 
-            if(reservations.size() != 0) {
-                int reservationID =view.getReservationID();
-                view.displayHeader("\nEditing Reservation " + reservationID);
+            if (reservations.size() != 0) {
+                int reservationID = view.getReservationID();
 
-                Reservation reservation = view.makeReservation(host);
-                reservation.setReservationID(reservationID);
-                Result<Reservation> result = reservationService.update(reservation);
+                reservationService.validateReservation(reservations, reservationID, result);
+                if (result.isSuccess()) {
+                    view.displayHeader("\nEditing Reservation " + reservationID);
+                    Reservation reservation = view.updateReservation(host, reservations.get(0));
 
-                if(result.isSuccess()) {
-                    String successMessage = String.format("Reservation %s updated.", result.getPayload().getReservationID());
-                    view.displayStatus(true, successMessage);
-                }
-                else {
+                    //if user doesn't continue [n], no set. So hostID null
+                    if (reservation.getHostID() == null) {
+                        return;
+                    }
+                    reservation.setReservationID(reservationID);
+                    result = reservationService.update(reservation);
+
+                    if (result.isSuccess()) {
+                        String successMessage = String.format("Reservation %s updated.", result.getPayload().getReservationID());
+                        view.displayStatus(true, successMessage);
+                    } else {
+                        view.displayStatus(false, result.getErrorMessages());
+                    }
+                } else {
                     view.displayStatus(false, result.getErrorMessages());
                 }
             }
-            else {
-                return;
-            }
-        }
-        else {
+        } else {
+            view.displayStatus(false, "Not a valid ID.");
             return;
         }
     }
 
     private void deleteReservation() throws DataException {
         Host host;
+        Result<Reservation> result = new Result<>();
 
         view.displayHeader("Cancel a Reservation");
 
@@ -165,28 +175,33 @@ public class Controller {
         String hostID = view.getHostID();
         host = hostService.findByID(hostID);
 
-        if(host != null) {
-            List<Reservation> reservations = reservationService.getReservationFromHostGuestID(hostID, guestID);
+        if (host != null) {
+            List<Reservation> reservations = reservationService.getReservationFromHostGuestIDFutureDates(hostID, guestID);
             view.displayHeader("\nReservations - " + host.getLastName());
             view.displayReservations(reservations);
 
-            if(reservations.size() != 0) {
+            if (reservations.size() != 0) {
                 int reservationID = view.getReservationID();
-                reservations = reservationService.getReservationFromReservationHostID(reservationID, hostID);
-                Result result = reservationService.delete(reservations);
+                Reservation reservation = reservationService.getReservationFromReservationHostID(reservationID, hostID);
 
+                reservationService.validateReservation(reservations, reservationID, result);
                 if (result.isSuccess()) {
-                    String successMessage = String.format("Reservation %s cancelled.", reservationID);
-                    view.displayStatus(true, successMessage);
+                    Result resultDelete = reservationService.delete(reservation);
+
+                    if (resultDelete.isSuccess()) {
+                        String successMessage = String.format("Reservation %s cancelled.", reservationID);
+                        view.displayStatus(true, successMessage);
+                    } else {
+                        view.displayStatus(false, resultDelete.getErrorMessages());
+                    }
                 } else {
                     view.displayStatus(false, result.getErrorMessages());
                 }
-            }
-            else {
+            } else {
                 return;
             }
-        }
-        else {
+        } else {
+            view.displayStatus(false, "Not a valid ID.");
             return;
         }
     }

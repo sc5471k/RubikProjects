@@ -14,12 +14,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Repository
-public class ReservationFileRepository implements ReservationRepository{
+public class ReservationFileRepository implements ReservationRepository {
 
     private static final String HEADER = "id,start_date,end_date,guest_id,total";
     private final String directory;
 
-    public ReservationFileRepository(@Value("${ReservationFilePath}") String directory){
+    public ReservationFileRepository(@Value("${ReservationFilePath}") String directory) {
         this.directory = directory;
     }
 
@@ -60,10 +60,19 @@ public class ReservationFileRepository implements ReservationRepository{
     }
 
     @Override
-    public List<Reservation> getReservationFromReservationHostID(int reservationID, String hostID) {
-        return   getReservations(hostID).stream()
-                .filter(reservation -> reservation.getReservationID() == reservationID)
+    public List<Reservation> getReservationFromHostGuestIDFutureDates(String hostID, int guestID) {
+        return getReservations(hostID).stream()
+                .filter(reservation -> reservation.getGuestID() == guestID)
+                .filter(reservation -> reservation.getStartDate().isAfter(LocalDate.now()))
+                .sorted(Comparator.comparing(Reservation::getStartDate))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Reservation getReservationFromReservationHostID(int reservationID, String hostID) {
+        return getReservations(hostID).stream()
+                .filter(reservation -> reservation.getReservationID() == reservationID)
+                .findFirst().get();
     }
 
     @Override
@@ -101,8 +110,7 @@ public class ReservationFileRepository implements ReservationRepository{
     }
 
     @Override
-    public boolean delete(List<Reservation> reservations) throws DataException {
-        Reservation reservation = reservations.get(0);
+    public boolean delete(Reservation reservation) throws DataException {
         List<Reservation> all = getReservations(reservation.getHostID());
         for (int i = 0; i < all.size(); i++) {
             if (all.get(i).getReservationID() == reservation.getReservationID() && all.get(i).getHostID().equals(reservation.getHostID())) {

@@ -53,7 +53,7 @@ public class View {
     }
 
     public String getHostID() {
-        return io.readString("Enter Host ID: ");
+        return io.readRequiredString("Enter Host ID: ");
     }
 
     public int getGuestID() {
@@ -67,6 +67,7 @@ public class View {
     public Reservation makeReservation(Host host) {
         LocalDate startDate = io.readLocalDate("Start date [MM/dd/yyyy]: ");
         LocalDate endDate = io.readLocalDate("End date [MM/dd/yyyy]: ");
+        int guestID = io.readInt("Guest ID: ");
 
         BigDecimal total = hostService.calculateTotal(host, startDate, endDate);
 
@@ -81,7 +82,29 @@ public class View {
             reservation.setStartDate(startDate);
             reservation.setEndDate(endDate);
             reservation.setHostID(host.getHostID());
-            reservation.setGuestID(io.readInt("Guest ID: "));
+            reservation.setGuestID(guestID);
+            reservation.setTotal(total);
+        }
+        return reservation;
+    }
+
+    public Reservation updateReservation(Host host, Reservation reservation) {
+        LocalDate startDate = io.readLocalDate("Start date [MM/dd/yyyy]: ");
+        LocalDate endDate = io.readLocalDate("End date [MM/dd/yyyy]: ");
+
+        BigDecimal total = hostService.calculateTotal(host, startDate, endDate);
+
+        displayHeader("Summary");
+        io.println("Start: " + startDate);
+        io.println("End: " + endDate);
+        io.println("Total: " + total);
+        String confirm = io.readString("Is this okay? [y/n]: ").toLowerCase();
+
+        if(confirm.equals("y")) {
+            reservation.setStartDate(startDate);
+            reservation.setEndDate(endDate);
+            reservation.setHostID(host.getHostID());
+            reservation.setGuestID(reservation.getGuestID());
             reservation.setTotal(total);
         }
         return reservation;

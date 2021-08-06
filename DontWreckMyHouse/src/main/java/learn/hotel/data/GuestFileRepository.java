@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Repository
-public class GuestFileRepository implements GuestRepository{
+public class GuestFileRepository implements GuestRepository {
     private final String directory;
 
     public GuestFileRepository(@Value("${GuestFilePath}") String directory) {
