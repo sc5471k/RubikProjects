@@ -151,7 +151,7 @@ public class ReservationService {
         //The reservation may never overlap existing reservation dates.
         List<Reservation> reservations = repo.getReservations(reservation.getHostID());
         for (Reservation r : reservations) {
-            if(reservation.getStartDate().isBefore(r.getEndDate())) {
+            if(!(reservation.getStartDate().compareTo(r.getEndDate()) >= 0 || reservation.getEndDate().compareTo(r.getStartDate()) <= 0)) {
                 result.addErrorMessage("The reservation may never overlap existing reservation dates");
                 return;
             }
@@ -176,10 +176,15 @@ public class ReservationService {
     }
 
     public Result<Reservation> validateReservation(List<Reservation> reservations, int reservationID, Result<Reservation> result) {
+        boolean isFound = false;
+
         for (Reservation reservation : reservations) {
-            if (reservation.getReservationID() != reservationID) {
-                result.addErrorMessage("Reservation can't be found");
+            if (reservation.getReservationID() == reservationID) {
+                isFound = true;
             }
+        }
+        if(!isFound) {
+            result.addErrorMessage("Reservation can't be found");
         }
         return result;
     }
