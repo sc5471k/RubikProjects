@@ -3,6 +3,7 @@ package learn.unexplained.domain;
 import learn.unexplained.data.DataAccessException;
 import learn.unexplained.data.EncounterRepository;
 import learn.unexplained.models.Encounter;
+import learn.unexplained.models.EncounterType;
 
 import java.util.List;
 import java.util.Objects;
@@ -63,4 +64,64 @@ public class EncounterService {
 
         return result;
     }
+
+    public Encounter findByType(EncounterType encounterType) throws DataAccessException {
+        List<Encounter> all = findAll();
+        for (Encounter encounter : all) {
+            if (encounter.getType() == encounterType) {
+                return encounter;
+            }
+        }
+        return null;
+    }
+
+    //not sure result type
+    public boolean update(Encounter encounter) throws DataAccessException {
+        EncounterResult result = validate(encounter);
+        if (!result.isSuccess()) {
+            return false;
+        }
+
+        // check for duplicate
+        List<Encounter> encounters = repository.findAll();
+        for (Encounter e : encounters) {
+            if (Objects.equals(encounter.getWhen(), e.getWhen())
+                    && Objects.equals(encounter.getType(), e.getType())
+                    && Objects.equals(encounter.getDescription(), e.getDescription())) {
+                result.addErrorMessage("duplicate encounter is not allowed");
+                return false;
+            }
+        }
+
+        for (int i = 0; i < encounters.size(); i++) {
+            if (encounters.get(i).getEncounterId() == encounter.getEncounterId()) {
+                encounters.set(i, encounter);
+                boolean yn = repository.update(encounters.get(i));
+
+                if(yn == true)
+                {
+                    result.isSuccess();
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    //not deleting
+    public boolean deleteById(int encounterId) throws DataAccessException {
+
+        List<Encounter> all = findAll();
+
+        for (int i = 0; i < all.size(); i++) {
+            if (all.get(i).getEncounterId() == encounterId) {
+                //all.remove(i);
+                repository.deleteById(encounterId);
+                return true;
+            }
+        }
+        return false;
+    }
+
+
 }

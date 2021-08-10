@@ -6,6 +6,8 @@ import learn.unexplained.models.Encounter;
 import learn.unexplained.models.EncounterType;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class EncounterServiceTest {
@@ -74,5 +76,47 @@ class EncounterServiceTest {
         EncounterResult result = new EncounterResult();
         result.addErrorMessage(message);
         return result;
+    }
+
+    @Test
+    void findByType() throws DataAccessException {
+        Encounter encounter = service.findByType(EncounterType.CREATURE);
+        assertNotNull(encounter);
+        assertEquals(EncounterType.CREATURE, encounter.getType());
+
+        encounter = service.findByType(EncounterType.VISION);
+        assertEquals(null, encounter);
+    }
+
+    @Test
+    void update() throws DataAccessException {
+        Encounter encounter = service.findByType(EncounterType.CREATURE);
+        encounter.setDescription("New test");
+        encounter.setOccurrences(2);
+        assertTrue(service.update(encounter));
+
+        encounter.setOccurrences(0);
+        encounter.setDescription("");
+        encounter.setWhen("");
+        assertFalse(service.update(encounter));
+
+        encounter = service.findByType(EncounterType.CREATURE);
+        assertNotNull(encounter);
+        assertEquals("New test", encounter.getDescription());
+        assertEquals(2, encounter.getOccurrences());
+
+        Encounter doesNotExist = new Encounter();
+        doesNotExist.setType(EncounterType.VISION);
+        assertFalse(service.update(doesNotExist));
+    }
+
+    //get 1 expected 0
+    @Test
+    void deleteById() throws DataAccessException {
+        int count = service.findAll().size();
+
+        assertTrue(service.deleteById(2));
+        assertFalse(service.deleteById(50));
+        assertEquals(count -1, service.findAll().size());
     }
 }

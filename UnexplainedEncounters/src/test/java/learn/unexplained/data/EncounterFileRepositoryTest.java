@@ -5,13 +5,20 @@ import learn.unexplained.models.EncounterType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class EncounterFileRepositoryTest {
 
+    static final String SEED_FILE_PATH = "./data/encounters-seed.csv";
     static final String TEST_PATH = "./data/encounters-test.csv";
+
     final Encounter[] testEncounters = new Encounter[]{
             new Encounter(1, EncounterType.UFO, "2020-01-01", "short test #1", 1),
             new Encounter(2, EncounterType.CREATURE, "2020-02-01", "short test #2", 1),
@@ -21,7 +28,12 @@ class EncounterFileRepositoryTest {
     EncounterRepository repository = new EncounterFileRepository(TEST_PATH);
 
     @BeforeEach
-    void setup() throws DataAccessException {
+    void setup() throws DataAccessException, IOException {
+        Path seedPath = Paths.get(SEED_FILE_PATH);
+        Path testPath = Paths.get(TEST_PATH);
+
+        Files.copy(seedPath, testPath, StandardCopyOption.REPLACE_EXISTING);
+
         for (Encounter e : repository.findAll()) {
             repository.deleteById(e.getEncounterId());
         }
@@ -54,4 +66,39 @@ class EncounterFileRepositoryTest {
         assertEquals(4, actual.getEncounterId());
     }
 
+    //doesn't work
+    @Test
+    void findByType() throws DataAccessException {
+        List<Encounter> encounter = repository.findByType(testEncounters, EncounterType.UFO);
+        assertNotNull(encounter);
+        assertEquals(EncounterType.UFO, encounter.get(0).getType());
+
+        encounter = repository.findByType(testEncounters, EncounterType.VISION);
+        assertEquals(0, encounter.size());
+    }
+
+    @Test
+    void update() throws DataAccessException {
+        Encounter encounter = repository.findById(1);
+        encounter.setDescription("New test");
+        encounter.setOccurrences(2);
+        assertTrue(repository.update(encounter));
+
+        encounter = repository.findById(1);
+        assertNotNull(encounter);
+        assertEquals("New test", encounter.getDescription());
+        assertEquals(2, encounter.getOccurrences());
+
+        Encounter doesNotExist = new Encounter();
+        doesNotExist.setType(EncounterType.VISION);
+        assertFalse(repository.update(doesNotExist));
+    }
+
+    @Test
+    void deleteById() throws DataAccessException {
+        int count = repository.findAll().size();
+        assertTrue(repository.deleteById(1));
+        assertFalse(repository.deleteById(50));
+        assertEquals(count -1, repository.findAll().size());
+    }
 }
