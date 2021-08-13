@@ -1,7 +1,5 @@
 package learn.field_agent.data;
 
-import learn.field_agent.data.mappers.AgencyMapper;
-import learn.field_agent.data.mappers.AgentMapper;
 import learn.field_agent.data.mappers.SecurityClearanceMapper;
 import learn.field_agent.models.SecurityClearance;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -10,6 +8,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 
@@ -17,9 +16,11 @@ import java.util.List;
 public class SecurityClearanceJdbcTemplateRepository implements SecurityClearanceRepository {
 
     private final JdbcTemplate jdbcTemplate;
+    private final AgencyAgentJdbcTemplateRepository agencyAgentJdbcTemplateRepository;
 
-    public SecurityClearanceJdbcTemplateRepository(JdbcTemplate jdbcTemplate) {
+    public SecurityClearanceJdbcTemplateRepository(JdbcTemplate jdbcTemplate, AgencyAgentJdbcTemplateRepository agencyAgentJdbcTemplateRepository) {
         this.jdbcTemplate = jdbcTemplate;
+        this.agencyAgentJdbcTemplateRepository = agencyAgentJdbcTemplateRepository;
     }
 
     @Override
@@ -65,5 +66,15 @@ public class SecurityClearanceJdbcTemplateRepository implements SecurityClearanc
                 + "name = ? "
                 + "where security_clearance_id = ?";
         return jdbcTemplate.update(sql, securityClearance.getName(), securityClearance.getSecurityClearanceId()) > 0;
+    }
+
+    @Override
+    public boolean deleteById(int securityID) throws SQLException {
+        boolean exist = agencyAgentJdbcTemplateRepository.checkSecurityIDExistence(securityID);
+        if(!exist) {
+            return jdbcTemplate.update(
+                    "delete from security_clearance where security_clearance_id = ?", securityID) > 0;
+        }
+        return false;
     }
 }

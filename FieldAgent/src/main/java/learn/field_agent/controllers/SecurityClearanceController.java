@@ -1,22 +1,22 @@
 package learn.field_agent.controllers;
 
 import learn.field_agent.domain.Result;
-import learn.field_agent.domain.SecurityService;
-import learn.field_agent.models.Agency;
+import learn.field_agent.domain.SecurityClearanceService;
 import learn.field_agent.models.SecurityClearance;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.SQLException;
 import java.util.List;
 
 @RestController
 @CrossOrigin(origins = {"http://localhost:3000"})
 @RequestMapping("/api/security")
 public class SecurityClearanceController {
-    private final SecurityService service;
+    private final SecurityClearanceService service;
 
-    public SecurityClearanceController(SecurityService service) {
+    public SecurityClearanceController(SecurityClearanceService service) {
         this.service = service;
     }
 
@@ -63,4 +63,12 @@ public class SecurityClearanceController {
 //    Delete a security clearance. (This requires a strategy.
 //    It's probably not appropriate to delete agency_agent records that depend on a security clearance.
 //    Only allow deletion if a security clearance key isn't referenced.)
+
+    @DeleteMapping("/{securityID}")
+    public ResponseEntity<Void> deleteById(@PathVariable int securityID) throws SQLException {
+        if (service.deleteById(securityID)) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
 }

@@ -1,18 +1,17 @@
 package learn.field_agent.domain;
 
 import learn.field_agent.data.SecurityClearanceRepository;
-import learn.field_agent.models.Agency;
 import learn.field_agent.models.SecurityClearance;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RestController;
 
+import java.sql.SQLException;
 import java.util.List;
 
 @Service
-public class SecurityService {
+public class SecurityClearanceService {
     private final SecurityClearanceRepository repository;
 
-    public SecurityService(SecurityClearanceRepository repository) {
+    public SecurityClearanceService(SecurityClearanceRepository repository) {
         this.repository = repository;
     }
 
@@ -58,6 +57,11 @@ public class SecurityService {
         return result;
     }
 
+    public boolean deleteById(int securityID) throws SQLException {
+        //check records in agency_agent if delete id is in there, if it is then don't delete
+        return repository.deleteById(securityID);
+    }
+
     private Result<SecurityClearance> validate(SecurityClearance securityClearance) {
         Result<SecurityClearance> result = new Result<>();
         if (securityClearance == null) {
@@ -71,7 +75,7 @@ public class SecurityService {
         }
 
         // Name cannot be duplicated.
-        List<SecurityClearance> securityClearanceList = repository.findAll();
+        List<SecurityClearance> securityClearanceList = findAll();
         for(SecurityClearance s : securityClearanceList) {
             if(s.getName().equals(securityClearance.getName())) {
                 result.addMessage("name cannot be duplicated", ResultType.INVALID);

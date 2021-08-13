@@ -1,8 +1,7 @@
 package learn.field_agent.domain;
 
-import learn.field_agent.data.AgencyRepository;
 import learn.field_agent.data.SecurityClearanceRepository;
-import learn.field_agent.models.Agency;
+import learn.field_agent.models.Agent;
 import learn.field_agent.models.SecurityClearance;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,21 +12,13 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
-class SecurityServiceTest {
+class SecurityClearanceServiceTest {
 
     @Autowired
-    SecurityService service;
+    SecurityClearanceService service;
 
     @MockBean
     SecurityClearanceRepository repository;
-
-    @Test
-    void findAll() {
-    }
-
-    @Test
-    void findById() {
-    }
 
     @Test
     void shouldAdd() {
