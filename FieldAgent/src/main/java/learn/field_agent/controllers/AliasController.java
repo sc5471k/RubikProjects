@@ -2,11 +2,15 @@ package learn.field_agent.controllers;
 
 import learn.field_agent.domain.AliasService;
 import learn.field_agent.domain.Result;
+import learn.field_agent.models.Agent;
 import learn.field_agent.models.Alias;
+import learn.field_agent.models.AliasAgent;
 import learn.field_agent.models.Location;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @CrossOrigin(origins = {"http://localhost:3000"})
@@ -19,10 +23,13 @@ public class AliasController {
         this.service = service;
     }
 
-//    Fetch an individual agent with aliases attached.
-    //look into alias table for agent_id look at agent table and display info
+    @GetMapping
+    public List<Alias> findAll() {
+        return service.findAll();
+    }
+
     @GetMapping("/{agentId}")
-    public Alias findAgentByAlias(@PathVariable int agentId) {
+    public AliasAgent findAgentByAlias(@PathVariable int agentId) {
         return service.findAgentByAlias(agentId);
     }
 

@@ -1,9 +1,11 @@
 package learn.field_agent.data;
 
+import learn.field_agent.data.mappers.AliasAgentMapper;
 import learn.field_agent.data.mappers.AliasMapper;
 import learn.field_agent.data.mappers.SecurityClearanceMapper;
 import learn.field_agent.models.AgencyAgent;
 import learn.field_agent.models.Alias;
+import learn.field_agent.models.AliasAgent;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -35,23 +37,16 @@ public class AliasJdbcTemplateRepository implements AliasRepository{
                 .orElse(null);
     }
 
+    // Fetch an individual agent with aliases attached.
+    //look into alias table for agent_id look at agent table and get info
     @Override
-    public Alias findAgentByAlias(int aliasID) {
-//        final String sql = "select agency_id, identifier, security_clearance_id, activation_date, is_active " +
-//                "from agency_agent " +
-//                "where security_clearance_id = ?;";
-//
-//        List<AgencyAgent> agencyAgentList = jdbcTemplate.query(sql, new Object[] {securityID}, (resultSet, rowNum) -> {
-//            AgencyAgent agencyAgent = new AgencyAgent();
-//            return agencyAgent;
-//        });
-//
-//        if (agencyAgentList.isEmpty()) {
-//            return false;
-//        } else {
-//            return true;
-//        }
-        return null;
+    public AliasAgent findAgentByAlias(int agentId) {
+        final String sql = "select al.alias_id, al.name, al.persona, a.agent_id, a.first_name, a.middle_name, a.last_name, " +
+                "a.dob, a.height_in_inches from alias al inner join agent a on al.agent_id = a.agent_id where al.agent_id = ?;";
+        //final String sql = "select alias_id, name, persona, agent_id from alias where agent_id = ?;";
+        return jdbcTemplate.query(sql, new AliasAgentMapper(), agentId).stream()
+                .findFirst()
+                .orElse(null);
     }
 
     @Override

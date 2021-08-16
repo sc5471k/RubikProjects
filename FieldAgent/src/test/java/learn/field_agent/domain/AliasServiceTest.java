@@ -69,16 +69,15 @@ class AliasServiceTest {
         alias.setPersona("S");
         alias.setAgentId(1);
 
-        Alias alias2 = new Alias();
+        List<Alias> mockOut = new ArrayList<>();
+        mockOut.add(alias);
+
+        Alias duplicate = new Alias();
         alias.setName("Sammi");
         alias.setAgentId(2);
 
-        List<Alias> mockOut = new ArrayList<>();
-        mockOut.add(alias);
-        mockOut.add(alias2);
-
         when(repository.findAll()).thenReturn(mockOut);
-        Result<Alias> actual = service.add(alias);
+        Result<Alias> actual = service.add(duplicate);
         assertEquals(ResultType.INVALID, actual.getType());
     }
 }
