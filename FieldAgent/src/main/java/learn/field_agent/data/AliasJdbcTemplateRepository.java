@@ -2,8 +2,6 @@ package learn.field_agent.data;
 
 import learn.field_agent.data.mappers.AliasAgentMapper;
 import learn.field_agent.data.mappers.AliasMapper;
-import learn.field_agent.data.mappers.SecurityClearanceMapper;
-import learn.field_agent.models.AgencyAgent;
 import learn.field_agent.models.Alias;
 import learn.field_agent.models.AliasAgent;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -16,7 +14,7 @@ import java.sql.Statement;
 import java.util.List;
 
 @Repository
-public class AliasJdbcTemplateRepository implements AliasRepository{
+public class AliasJdbcTemplateRepository implements AliasRepository {
 
     private final JdbcTemplate jdbcTemplate;
 
@@ -43,7 +41,6 @@ public class AliasJdbcTemplateRepository implements AliasRepository{
     public AliasAgent findAgentByAlias(int agentId) {
         final String sql = "select al.alias_id, al.name, al.persona, a.agent_id, a.first_name, a.middle_name, a.last_name, " +
                 "a.dob, a.height_in_inches from alias al inner join agent a on al.agent_id = a.agent_id where al.agent_id = ?;";
-        //final String sql = "select alias_id, name, persona, agent_id from alias where agent_id = ?;";
         return jdbcTemplate.query(sql, new AliasAgentMapper(), agentId).stream()
                 .findFirst()
                 .orElse(null);

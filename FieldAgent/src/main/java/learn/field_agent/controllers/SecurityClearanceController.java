@@ -20,13 +20,13 @@ public class SecurityClearanceController {
         this.service = service;
     }
 
-//    Find all security clearances.
+    //    Find all security clearances.
     @GetMapping
     public List<SecurityClearance> findAll() {
         return service.findAll();
     }
 
-//    Find a security clearance by its identifier.
+    //    Find a security clearance by its identifier.
     @GetMapping("/{securityID}")
     public ResponseEntity<SecurityClearance> findById(@PathVariable int securityID) {
         SecurityClearance security = service.findById(securityID);
@@ -36,7 +36,7 @@ public class SecurityClearanceController {
         return ResponseEntity.ok(security);
     }
 
-//    Add a security clearance.
+    //    Add a security clearance.
     @PostMapping
     public ResponseEntity<Object> add(@RequestBody SecurityClearance securityClearance) {
         Result<SecurityClearance> result = service.add(securityClearance);
@@ -46,7 +46,7 @@ public class SecurityClearanceController {
         return ErrorResponse.build(result);
     }
 
-//    Update an existing security clearance.
+    //    Update an existing security clearance.
     @PutMapping("/{securityID}")
     public ResponseEntity<Object> update(@PathVariable int securityID, @RequestBody SecurityClearance securityClearance) {
         if (securityID != securityClearance.getSecurityClearanceId()) {

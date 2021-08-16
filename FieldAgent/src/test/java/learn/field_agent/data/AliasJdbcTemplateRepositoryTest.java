@@ -1,6 +1,5 @@
 package learn.field_agent.data;
 
-import learn.field_agent.models.Agent;
 import learn.field_agent.models.Alias;
 import learn.field_agent.models.AliasAgent;
 import org.junit.jupiter.api.BeforeEach;
@@ -8,7 +7,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.time.LocalDate;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;

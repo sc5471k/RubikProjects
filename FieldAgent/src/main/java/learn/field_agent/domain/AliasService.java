@@ -70,16 +70,16 @@ public class AliasService {
         }
 
         //Name is required.
-        if(Validations.isNullOrBlank(alias.getName())) {
+        if (Validations.isNullOrBlank(alias.getName())) {
             result.addMessage("Name is required", ResultType.INVALID);
         }
 
         //Persona is not required unless a name is duplicated. The persona differentiates between duplicate names.
         List<Alias> aliasList = findAll();
-        for(Alias a : aliasList) {
-            if(a.getName().equals(alias.getName())) {
-                if(Validations.isNullOrBlank(alias.getPersona()))
-                result.addMessage("Name is duplicated, persona is required.", ResultType.INVALID);
+        for (Alias a : aliasList) {
+            if (a.getName().equals(alias.getName())) {
+                if (Validations.isNullOrBlank(alias.getPersona()))
+                    result.addMessage("Name is duplicated, persona is required.", ResultType.INVALID);
             }
         }
         return result;

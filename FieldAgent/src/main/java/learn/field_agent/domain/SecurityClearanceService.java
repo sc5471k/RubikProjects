@@ -69,14 +69,14 @@ public class SecurityClearanceService {
         }
 
         // Security clearance name is required.
-        if(Validations.isNullOrBlank(securityClearance.getName())) {
+        if (Validations.isNullOrBlank(securityClearance.getName())) {
             result.addMessage("name is required", ResultType.INVALID);
         }
 
         // Name cannot be duplicated.
         List<SecurityClearance> securityClearanceList = findAll();
-        for(SecurityClearance s : securityClearanceList) {
-            if(s.getName().equals(securityClearance.getName())) {
+        for (SecurityClearance s : securityClearanceList) {
+            if (s.getName().equals(securityClearance.getName())) {
                 result.addMessage("name cannot be duplicated", ResultType.INVALID);
             }
         }

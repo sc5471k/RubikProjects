@@ -1,13 +1,11 @@
 package learn.field_agent.data;
 
-import learn.field_agent.models.Agency;
 import learn.field_agent.models.SecurityClearance;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.sql.SQLException;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -46,7 +44,7 @@ class SecurityClearanceJdbcTemplateRepositoryTest {
         assertEquals(topSecret, actual);
 
         actual = repository.findById(3);
-        assertEquals(null, actual);
+        assertNull(actual);
     }
 
     @Test
@@ -74,11 +72,11 @@ class SecurityClearanceJdbcTemplateRepositoryTest {
         assertTrue(result);
 
         SecurityClearance find = repository.findById(2);
-        assertEquals(null, find);
+        assertNull(find);
     }
 
     @Test
-    void shouldNotDeleteIfExistInAgentAgency(){
+    void shouldNotDeleteIfExistInAgentAgency() {
         boolean result = repository.deleteById(1);
         assertFalse(result);
     }

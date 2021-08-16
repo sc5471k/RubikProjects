@@ -1,7 +1,6 @@
 package learn.field_agent.domain;
 
 import learn.field_agent.data.SecurityClearanceRepository;
-import learn.field_agent.models.Agent;
 import learn.field_agent.models.SecurityClearance;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)

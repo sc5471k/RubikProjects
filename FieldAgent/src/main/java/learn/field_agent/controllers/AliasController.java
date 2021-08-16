@@ -2,10 +2,8 @@ package learn.field_agent.controllers;
 
 import learn.field_agent.domain.AliasService;
 import learn.field_agent.domain.Result;
-import learn.field_agent.models.Agent;
 import learn.field_agent.models.Alias;
 import learn.field_agent.models.AliasAgent;
-import learn.field_agent.models.Location;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -33,7 +31,7 @@ public class AliasController {
         return service.findAgentByAlias(agentId);
     }
 
-//    Add an alias.
+    //    Add an alias.
     @PostMapping
     public ResponseEntity<Object> add(@RequestBody Alias alias) {
         Result<Alias> result = service.add(alias);
@@ -43,7 +41,7 @@ public class AliasController {
         return ErrorResponse.build(result);
     }
 
-//    Update an alias.
+    //    Update an alias.
     @PutMapping("/{aliasId}")
     public ResponseEntity<Object> update(@PathVariable int aliasId, @RequestBody Alias alias) {
         if (aliasId != alias.getAliasID()) {
@@ -58,10 +56,10 @@ public class AliasController {
         return ErrorResponse.build(result);
     }
 
-//    Delete an alias. (No strategy required. An alias is never referenced elsewhere.)
+    //    Delete an alias. (No strategy required. An alias is never referenced elsewhere.)
     @DeleteMapping("/{aliasId}")
     public ResponseEntity<Void> deleteById(@PathVariable int aliasId) {
-        if(service.deleteById(aliasId)) {
+        if (service.deleteById(aliasId)) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);

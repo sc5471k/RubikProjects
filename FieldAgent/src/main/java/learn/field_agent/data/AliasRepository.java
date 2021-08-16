@@ -8,8 +8,12 @@ import java.util.List;
 public interface AliasRepository {
 
     List<Alias> findAll();
+
     AliasAgent findAgentByAlias(int aliasID);
+
     Alias add(Alias alias);
+
     boolean update(Alias alias);
+
     boolean deleteById(int aliasID);
 }

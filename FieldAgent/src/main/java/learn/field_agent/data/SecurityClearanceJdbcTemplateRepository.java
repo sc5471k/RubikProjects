@@ -8,7 +8,6 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 
@@ -71,7 +70,7 @@ public class SecurityClearanceJdbcTemplateRepository implements SecurityClearanc
     @Override
     public boolean deleteById(int securityID) {
         boolean exist = agencyAgentJdbcTemplateRepository.checkSecurityIDExistence(securityID);
-        if(!exist) {
+        if (!exist) {
             return jdbcTemplate.update(
                     "delete from security_clearance where security_clearance_id = ?", securityID) > 0;
         }
