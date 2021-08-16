@@ -50,8 +50,8 @@ class AliasServiceTest {
         Result<Alias> actual = service.add(alias);
         assertEquals(ResultType.INVALID, actual.getType());
     }
-    //Persona is not required unless a name is duplicated. The persona differentiates between duplicate names.
 
+    //Persona is not required unless a name is duplicated. The persona differentiates between duplicate names.
     @Test
     void validatePersonaNotRequired() {
         Alias alias = new Alias();
@@ -72,7 +72,6 @@ class AliasServiceTest {
         Alias alias2 = new Alias();
         alias.setName("Sammi");
         alias.setAgentId(2);
-
 
         List<Alias> mockOut = new ArrayList<>();
         mockOut.add(alias);

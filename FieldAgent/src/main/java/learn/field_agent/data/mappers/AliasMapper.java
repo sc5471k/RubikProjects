@@ -14,7 +14,7 @@ public class AliasMapper implements RowMapper<Alias> {
         alias.setAliasID(resultSet.getInt("alias_id"));
         alias.setName(resultSet.getString("name"));
         alias.setPersona(resultSet.getString("persona"));
-        alias.setAgentId(resultSet.getInt("agency_id"));
+        alias.setAgentId(resultSet.getInt("agent_id"));
         return alias;
     }
 }

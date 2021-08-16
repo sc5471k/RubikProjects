@@ -58,7 +58,6 @@ public class SecurityClearanceService {
     }
 
     public boolean deleteById(int securityID) throws SQLException {
-        //check records in agency_agent if delete id is in there, if it is then don't delete
         return repository.deleteById(securityID);
     }
 

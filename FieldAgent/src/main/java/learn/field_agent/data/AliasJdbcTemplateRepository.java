@@ -80,7 +80,7 @@ public class AliasJdbcTemplateRepository implements AliasRepository{
         //don't allow update to agent for now
         final String sql = "update alias set "
                 + "name = ?, "
-                + "persona = ?, "
+                + "persona = ? "
                 + "where alias_id = ?;";
 
         return jdbcTemplate.update(sql,
