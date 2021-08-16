@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
 import java.sql.*;
+import java.util.List;
 
 @Repository
 public class AgencyAgentJdbcTemplateRepository implements AgencyAgentRepository {
@@ -79,53 +80,20 @@ public class AgencyAgentJdbcTemplateRepository implements AgencyAgentRepository 
         return jdbcTemplate.update(sql, agencyId, agentId) > 0;
     }
 
-//    public boolean checkSecurityIDExistence(int securityID) {
-//        boolean exist = false;
-//        int count = 0;
-//        final String sql = "select agency_id, identifier, security_clearance_id, activation_date, is_active " +
-//                "from agency_agent " +
-//                "where security_clearance_id = '" + securityID + "';";
-//
-//        try (Connection conn = dataSource.getConnection();
-//             Statement statement = conn.createStatement();
-//             ResultSet rs = statement.executeQuery(sql)) {
-//
-//            while (rs.next()) {
-//                count++;
-//            }
-//
-//        } catch (SQLException ex) {
-//            ex.printStackTrace();
-//        }
-//
-////        AgencyAgent agencyAgent = jdbcTemplate.query(sql, new AgencyAgentMapper(), securityID).stream()
-////                .findFirst()
-////                .orElse(null);
-//
-//        if(count > 0) {
-//            exist = true;
-//        }
-//        return exist;
-//    }
-
-    public boolean checkSecurityIDExistence(int securityID) throws SQLException {
+    public boolean checkSecurityIDExistence(int securityID) {
         final String sql = "select agency_id, identifier, security_clearance_id, activation_date, is_active " +
                 "from agency_agent " +
                 "where security_clearance_id = ?;";
 
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement statement = conn.prepareStatement(sql)) {
+        List<AgencyAgent> agencyAgentList = jdbcTemplate.query(sql, new Object[] {securityID}, (resultSet, rowNum) -> {
+            AgencyAgent agencyAgent = new AgencyAgent();
+            return agencyAgent;
+        });
 
-            statement.setInt(1, securityID);
-
-            try(ResultSet rs = statement.executeQuery()) {
-                while (rs.next()) {
-                    return true;
-                }
-            }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        }
+        if (agencyAgentList.isEmpty()) {
             return false;
+        } else {
+            return true;
+        }
     }
 }

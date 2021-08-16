@@ -62,39 +62,25 @@ class SecurityClearanceJdbcTemplateRepositoryTest {
     @Test
     void shouldUpdate() {
         SecurityClearance securityClearance = makeSecurityClearance();
-        securityClearance.setSecurityClearanceId(3);
+        securityClearance.setSecurityClearanceId(1);
         assertTrue(repository.update(securityClearance));
         securityClearance.setSecurityClearanceId(13);
         assertFalse(repository.update(securityClearance));
     }
 
     @Test
-    void shouldDelete() throws SQLException {
-//        delete FROM field_agent_test.security_clearance where security_clearance_id = 3;
-//        alter table security_clearance auto_increment = 0;
-
-//        SecurityClearance securityClearance = new SecurityClearance();
-//        securityClearance.setName("Testing Clearance");
-//        SecurityClearance actual = repository.add(securityClearance);
-//
-//        assertNotNull(actual);
-//        assertEquals(3, actual.getSecurityClearanceId());
-
-        boolean result = repository.deleteById(3);
+    void shouldDelete() {
+        boolean result = repository.deleteById(2);
         assertTrue(result);
 
-        SecurityClearance find = repository.findById(3);
+        SecurityClearance find = repository.findById(2);
         assertEquals(null, find);
     }
 
     @Test
-    void shouldNotDeleteIfExistInAgentAgency() throws SQLException {
-        SecurityClearance secret = new SecurityClearance(1, "Secret");
+    void shouldNotDeleteIfExistInAgentAgency(){
         boolean result = repository.deleteById(1);
         assertFalse(result);
-
-        SecurityClearance find = repository.findById(1);
-        assertEquals(secret, find);
     }
 
     SecurityClearance makeSecurityClearance() {

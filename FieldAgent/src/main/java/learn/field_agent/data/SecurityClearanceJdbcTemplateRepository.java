@@ -69,7 +69,7 @@ public class SecurityClearanceJdbcTemplateRepository implements SecurityClearanc
     }
 
     @Override
-    public boolean deleteById(int securityID) throws SQLException {
+    public boolean deleteById(int securityID) {
         boolean exist = agencyAgentJdbcTemplateRepository.checkSecurityIDExistence(securityID);
         if(!exist) {
             return jdbcTemplate.update(
