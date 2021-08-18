@@ -12,7 +12,7 @@ import java.util.List;
 
 @RestController
 @CrossOrigin(origins = {"http://localhost:3000"})
-@RequestMapping("/api/agent")
+@RequestMapping("/api/alias")
 public class AliasController {
 
     private final AliasService service;

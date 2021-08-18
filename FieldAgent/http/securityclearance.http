@@ -1,0 +1,30 @@
+@url = http://localhost:8080/api/security
+
+GET {{url}} HTTP/1.1
+
+###
+
+GET {{url}}/1 HTTP/1.1
+
+###
+
+POST localhost:8080/api/security HTTP/1/1
+Content-Type: application/json
+
+{
+    "name": "Test"
+}
+
+###
+
+PUT {{url}}/1 HTTP/1.1
+Content-Type: application/json
+
+{
+    "security_clearance_id": 1,
+    "name": "Top Top Secret"
+}
+
+###
+
+DELETE {{url}}/2 HTTP/1.1
