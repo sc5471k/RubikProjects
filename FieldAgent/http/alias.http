@@ -8,13 +8,13 @@ GET {{url}}/1 HTTP/1.1
 
 ###
 
-POST localhost:8080/api/alias HTTP/1/1
+POST http://localhost:8080/api/alias HTTP/1/1
 Content-Type: application/json
 
 {
-    "name": "Test",
+    "name": "Test2",
     "persona": "T",
-    "agent_id": "2"
+    "agentId": "2"
 }
 
 ###

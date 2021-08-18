@@ -119,14 +119,8 @@ public class AgentJdbcTemplateRepository implements AgentRepository {
     }
 
     private void addAliases(Agent agent) {
-        final String sql = "select al.alias_id, al.name, al.persona, " +
-                "a.agent_id, a.first_name, a.middle_name, a.last_name, " +
-                "a.dob, a.height_in_inches " +
-                "from alias al " +
-                "inner join agent a on al.agent_id = a.agent_id " +
-                "where al.agent_id = ?;";
-//        final String sql = "insert into alias(name, persona, agent_id)"
-//                + "values (?,?,?);";
+        final String sql = "select alias_id, name, persona, agent_id from alias " +
+                "where agent_id = ?;";
         List<Alias> aliases = jdbcTemplate.query(sql, new AliasMapper(), agent.getAgentId());
         agent.setAliases(aliases);
     }
